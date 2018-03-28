@@ -3,7 +3,9 @@
 Magento 2 Payment Module
 ============================
 
-Make payments in your Magento 2 webshop possible. Download the special Magento 2 webshop module [here](https://github.com/ICEPAY/Magento-2/releases), and you will be able to offer the most frequently used national and international online payment methods.
+ICEPAY Magento 2 Payment Module is a more robust and reliable and, at the same time, more powerful, flexible and secure version of our time-tested extension that enables the use of ICEPAY payment methods in your Magento2 webshop. Integrating ICEPAY with Magento 2 is simple and seamless for customers, and fast and easy for installation and maintenance at the back end.
+
+Make payments in your Magento 2 webshop possible. Download the special Magento 2 webshop module [here](https://github.com/ICEPAY/Magento-2/releases) and you will be able to offer a vast variety of most frequently used national and international online payment methods and solutions for worldwide internet commerce.
 
 License
 -------
