@@ -22,7 +22,7 @@ abstract class Paymentmethod extends \Magento\Backend\App\Action
 
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('Icepay_IcpCore::paymentmethod');
+        return $this->_authorization->isAllowed('Icepay_IcpCore::paymentmethod_view');
     }
 
     protected function _initAction()

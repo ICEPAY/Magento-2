@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace Icepay\IcpCore\Model\Checkout;
 
 //TODO: replace
@@ -36,7 +32,7 @@ class Checkout
     /**
      * @var \Magento\Quote\Model\Quote
      */
-    protected $_quote;
+    protected $quote;
 
     /**
      * Config instance
@@ -44,27 +40,20 @@ class Checkout
      * @var PaypalConfig
      */
     protected $_config;
-
-    /**
-     * API instance
-     *
-     * @var \Magento\Paypal\Model\Api\Nvp
-     */
-    protected $_api;
-
+    
     /**
      * ICEPAY Payment Object instance
      *
      * @var \
      */
-    protected $_paymentObject;
+    protected $paymentObject;
 
     /**
      * ICEPAY Webservice Object instance
      *
      * @var \
      */
-    protected $_webserviceObject;
+    protected $webserviceObject;
 
     /**
      * State helper variable
@@ -100,10 +89,10 @@ class Checkout
      */
     protected $_order;
 
-    /**
-     * @var \Magento\Framework\App\Cache\Type\Config
-     */
-    protected $_configCacheType;
+//    /**
+//     * @var \Magento\Framework\App\Cache\Type\Config
+//     */
+//    protected $_configCacheType;
 
     /**
      * Checkout data
@@ -192,20 +181,20 @@ class Checkout
      */
     protected $quoteRepository;
 
+//    /**
+//     * @var \Magento\Quote\Api\CartManagementInterface
+//     */
+//    protected $quoteManagement;
+
     /**
      * @var \Magento\Quote\Api\CartManagementInterface
      */
-    protected $quoteManagement;
+    private $cartManagement;
 
     /**
      * @var \Magento\Quote\Model\Quote\TotalsCollector
      */
     protected $totalsCollector;
-
-    /**
-     * @var Icepay_Result
-     */
-    protected $icepayResult;
 
     /**
      * Core store config
@@ -220,6 +209,11 @@ class Checkout
     protected $countryProvider;
 
     /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+    protected $_orderFactory;
+
+    /**
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Customer\Model\Url $customerUrl
      * @param \Magento\Tax\Helper\Data $taxData
@@ -231,7 +225,7 @@ class Checkout
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Paypal\Model\CartFactory $cartFactory
      * @param \Magento\Checkout\Model\Type\OnepageFactory $onepageFactory
-     * @param \Magento\Quote\Api\CartManagementInterface $quoteManagement
+     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
      * @param DataObject\Copy $objectCopyService
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
@@ -256,7 +250,7 @@ class Checkout
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Checkout\Model\Cart $cart,
         \Magento\Checkout\Model\Type\OnepageFactory $onepageFactory,
-        \Magento\Quote\Api\CartManagementInterface $quoteManagement,
+        \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Framework\DataObject\Copy $objectCopyService,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
@@ -269,13 +263,14 @@ class Checkout
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\ObjectManagerInterface $objectManager,
+        \Magento\Sales\Model\OrderFactory $orderFactory,
         $params = []
     ) {
-        $this->quoteManagement = $quoteManagement;
+        $this->cartManagement = $cartManagement;
         $this->_customerUrl = $customerUrl;
         $this->_taxData = $taxData;
         $this->_checkoutData = $checkoutData;
-        $this->_configCacheType = $configCacheType;
+//        $this->_configCacheType = $configCacheType;
         $this->_logger = $logger;
         $this->_localeResolver = $localeResolver;
         $this->_storeManager = $storeManager;
@@ -293,11 +288,12 @@ class Checkout
         $this->totalsCollector = $totalsCollector;
         $this->_scopeConfig = $scopeConfig;
         $this->_objectManager = $objectManager;
+        $this->_orderFactory = $orderFactory;
         $this->_customerSession = isset($params['session'])
             && $params['session'] instanceof \Magento\Customer\Model\Session ? $params['session'] : $customerSession;
 
         if (isset($params['quote']) && $params['quote'] instanceof \Magento\Quote\Model\Quote) {
-            $this->_quote = $params['quote'];
+            $this->quote = $params['quote'];
         } else {
             throw new \Exception('Quote instance is required.');
         }
@@ -312,36 +308,12 @@ class Checkout
      */
     public function setCustomerData(CustomerDataObject $customerData)
     {
-        $this->_quote->assignCustomer($customerData);
+        $this->quote->assignCustomer($customerData);
         $this->_customerId = $customerData->getId();
         return $this;
     }
 
 
-    /**
-     * Init Icepay_Result object
-     *
-     * @param Icepay_Result $icepayResult
-     */
-    public function initIcepayResult()
-    {
-
-        $icepayResult = $this->_objectManager->create('Icepay_Result');
-
-        $merchantId = $this->_scopeConfig->getValue('payment/icepay_settings/merchant_id', ScopeInterface::SCOPE_STORE, $this->_storeManager->getStore());
-        $secretCode = $this->_encryptor->decrypt($this->_scopeConfig->getValue('payment/icepay_settings/merchant_secret', ScopeInterface::SCOPE_STORE, $this->_storeManager->getStore()));
-
-        $result = $icepayResult->setMerchantID($merchantId)->setSecretCode($secretCode);
-
-        if($result->validate()) {
-
-            $this->icepayResult = $result;
-
-            $this->_checkoutSession->setIcepayTransactionData($this->icepayResult->getResultData());
-            return true;
-        }
-        throw new \Exception('Feiled to validete ICEPAY result');
-    }
 
     /**
      * Return checkout session object
@@ -355,79 +327,95 @@ class Checkout
 
 
     /**
-     * Reserve order ID for specified quote and start checkout on ICEPAY
+     * Start checkout on ICEPAY
      *
      * @param string $returnUrl
      * @param string $cancelUrl
      * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function start($returnUrl, $cancelUrl)
+    public function startPayment($returnUrl, $cancelUrl)
     {
-        $this->_quote->collectTotals();
+//        $this->quote->collectTotals();
+//
+//        if (!$this->quote->getGrandTotal()) {
+//            throw new \Magento\Framework\Exception\LocalizedException(
+//                __(
+//                    'ICEPAY can\'t process orders with a zero balance due. '
+//                    . 'To finish your purchase, please go through the standard checkout process.'
+//                )
+//            );
+//        }
+//
+//        $this->quote->reserveOrderId();
+//        $this->quoteRepository->save($this->quote);
 
-        if (!$this->_quote->getGrandTotal()) {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __(
-                    'ICEPAY can\'t process orders with a zero balance due. '
-                    . 'To finish your purchase, please go through the standard checkout process.'
-                )
-            );
-        }
 
-        $this->_quote->reserveOrderId();
-        $this->quoteRepository->save($this->_quote);
+        // check if there is an order
+        $orderId = $this->_getCheckoutSession()->getLastOrderId();
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $orderId ? $this->_orderFactory->create()->load($orderId) : false;
+        if ($order && $order->getId() && $order->getQuoteId() == $this->_getCheckoutSession()->getQuoteId()) {
 
-        //get ICEPAY payment method code
-        $icepayCode = $this->_quote->getPayment()->getMethodInstance()->getIcepayMethodCode();
-        //get issuer for ICEPAY payment method
-        $issuer = addslashes(htmlspecialchars($this->_quote->getPayment()->getAdditionalInformation(self::ICEPAY_ISSUER_KEY)));
+            $this->quote = $this->quoteRepository->get($order->getQuoteId()); //TODO
 
-        $checkoutLanguage = $this->getCheckoutLanguage();
 
-        $countryCode = $this->countryProvider->getCountry($this->_quote);
+                /**
+                 * @var \Magento\Quote\Model\Quote\Payment
+                 */
+            $payment = $this->quote->getPayment();
 
-        //Get module configuration settings
-        $merchantId = $this->_scopeConfig->getValue('payment/icepay_settings/merchant_id', ScopeInterface::SCOPE_STORE, $this->_storeManager->getStore());
-        $secretCode = $this->_scopeConfig->getValue('payment/icepay_settings/merchant_secret', ScopeInterface::SCOPE_STORE, $this->_storeManager->getStore());
-        $secretCode = $this->_encryptor->decrypt($secretCode);
-        
-        // prepare ICEPAY Payment Object
-        $this->getIcepayApiPaymentObject();
+            //get ICEPAY payment method code
+            $icepayCode = $payment->getMethodInstance()->getIcepayMethodCode();
+            //get issuer for ICEPAY payment method
+            $issuer = addslashes(htmlspecialchars($this->quote->getPayment()->getAdditionalInformation(self::ICEPAY_ISSUER_KEY)));
 
-        $this->_paymentObject->setAmount($this->_quote->getBaseGrandTotal() * 100)
-            ->setCountry($countryCode)
-            ->setLanguage($checkoutLanguage)
-            ->setIssuer($issuer)
-            ->setPaymentMethod($icepayCode)
-            ->setDescription('Merchant '. $merchantId. ' OrderID '.$this->_quote->getReservedOrderId())
-            ->setCurrency($this->_quote->getBaseCurrencyCode())
-            ->setOrderID(($this->_quote->getReservedOrderId()))
-            ->setReference('Order: '.$this->_quote->getReservedOrderId().', Customer: '. $this->_quote->getCustomerEmail());
+            $checkoutLanguage = $this->getCheckoutLanguage();
 
-        // prepare ICEPAY Webservice Object
-        $this->getIcepayApiWebserviceObject();
+            $countryCode = $this->countryProvider->getCountry($this->quote);
 
-        $this->_webserviceObject
-            ->setMerchantID($merchantId)
-            ->setSecretCode($secretCode)
-            ->setSuccessURL($returnUrl)
-            ->setErrorURL($cancelUrl)
-            ->setupClient();
-        
+            //Get module configuration settings
+            $merchantId = $this->_scopeConfig->getValue('payment/icepay_settings/merchant_id', ScopeInterface::SCOPE_STORE, $this->_storeManager->getStore());
+            $secretCode = $this->_scopeConfig->getValue('payment/icepay_settings/merchant_secret', ScopeInterface::SCOPE_STORE, $this->_storeManager->getStore());
+            $secretCode = $this->_encryptor->decrypt($secretCode);
+
+            // prepare ICEPAY Payment Object
+            $this->getIcepayApiPaymentObject();
+
+            $this->paymentObject->setAmount($this->quote->getBaseGrandTotal() * 100)
+                ->setCountry($countryCode)
+                ->setLanguage($checkoutLanguage)
+                ->setIssuer($issuer)
+                ->setPaymentMethod($icepayCode)
+                ->setDescription('Merchant ' . $merchantId . ' OrderID ' . $order->getIncrementId())
+                ->setCurrency($this->quote->getBaseCurrencyCode())
+                ->setOrderID($order->getIncrementId())
+                ->setReference('Order: ' . $order->getIncrementId(). ', Customer: ' . $this->quote->getCustomerEmail());
+
+            // prepare ICEPAY Webservice Object
+            $this->getIcepayApiWebserviceObject();
+
+            $this->webserviceObject
+                ->setMerchantID($merchantId)
+                ->setSecretCode($secretCode)
+                ->setSuccessURL($returnUrl)
+                ->setErrorURL($cancelUrl)
+                ->setupClient();
+
 //        try
 //        {
-            $transactionObj = $this->_webserviceObject->checkOut($this->_paymentObject);
+            $transactionObj = $this->webserviceObject->checkOut($this->paymentObject);
             $this->_setRedirectUrl($transactionObj->getPaymentScreenURL());
 //        } catch (\Exception $e) {
 //            //TODO: error message, localized exception
 //            return false;
 //        }
 
-        $payment = $this->_quote->getPayment();
-        $payment->save();
+            $payment = $this->quote->getPayment();
+            $payment->save();
 
-        return true;
+            return true;
+        }
     }
 
 
@@ -456,11 +444,11 @@ class Checkout
      */
     protected function getIcepayApiPaymentObject()
     {
-        if (null === $this->_paymentObject)
+        if (null === $this->paymentObject)
         {
-            $this->_paymentObject = $this->_objectManager->get('Icepay_PaymentObject');
+            $this->paymentObject = $this->_objectManager->get('Icepay_PaymentObject');
         }
-        return $this->_paymentObject;
+        return $this->paymentObject;
     }
 
     /**
@@ -468,10 +456,10 @@ class Checkout
      */
     protected function getIcepayApiWebserviceObject()
     {
-        if (null === $this->_webserviceObject) {
-            $this->_webserviceObject = $this->_objectManager->get('Icepay_Webservice_Pay');
+        if (null === $this->webserviceObject) {
+            $this->webserviceObject = $this->_objectManager->get('Icepay_Webservice_Pay');
         }
-        return $this->_webserviceObject;
+        return $this->webserviceObject;
     }
 
 
@@ -481,31 +469,30 @@ class Checkout
         return substr($this->_localeResolver->getLocale(), 0, 2);
     }
 
-
     /**
-     * Place the order when customer returned from ICEPAY
+     * Place the order
      *
      * @throws \Exception
      */
     public function place()
     {
 
-        if(!isset($this->icepayResult))
-            throw new \Exception('ICEPAY result is not set');
-
         if ($this->getCheckoutMethod() == \Magento\Checkout\Model\Type\Onepage::METHOD_GUEST) {
             $this->prepareGuestQuote();
         }
-        
-        $this->_quote->collectTotals();
-        $order = $this->quoteManagement->submit($this->_quote);
 
-        if (!$order) {
+        $this->quote->collectTotals();
+        $orderId = $this->cartManagement->placeOrder($this->quote->getId());
+//        $order = $this->cartManagement->submit($this->quote);
+
+        if (!$orderId) {
             return;
         }
 
-        $this->_order = $order;
+//        $this->_order = $order;
+        $this->_order = $this->_orderFactory->create()->load($orderId);
     }
+
 
 
     /**
@@ -528,14 +515,14 @@ class Checkout
         if ($this->getCustomerSession()->isLoggedIn()) {
             return \Magento\Checkout\Model\Type\Onepage::METHOD_CUSTOMER;
         }
-        if (!$this->_quote->getCheckoutMethod()) {
-            if ($this->_checkoutData->isAllowedGuestCheckout($this->_quote)) {
-                $this->_quote->setCheckoutMethod(\Magento\Checkout\Model\Type\Onepage::METHOD_GUEST);
+        if (!$this->quote->getCheckoutMethod()) {
+            if ($this->_checkoutData->isAllowedGuestCheckout($this->quote)) {
+                $this->quote->setCheckoutMethod(\Magento\Checkout\Model\Type\Onepage::METHOD_GUEST);
             } else {
-                $this->_quote->setCheckoutMethod(\Magento\Checkout\Model\Type\Onepage::METHOD_REGISTER);
+                $this->quote->setCheckoutMethod(\Magento\Checkout\Model\Type\Onepage::METHOD_REGISTER);
             }
         }
-        return $this->_quote->getCheckoutMethod();
+        return $this->quote->getCheckoutMethod();
     }
 
     /**
@@ -556,7 +543,7 @@ class Checkout
      */
     protected function prepareGuestQuote()
     {
-        $quote = $this->_quote;
+        $quote = $this->quote;
         $quote->setCustomerId(null)
             ->setCustomerEmail($quote->getBillingAddress()->getEmail())
             ->setCustomerIsGuest(true)

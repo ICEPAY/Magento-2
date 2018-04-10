@@ -1,10 +1,13 @@
 <?php
 /**
  *
- * Copyright © 2016 Magento. All rights reserved.
+ * Copyright © 2017 ICEPAY. All rights reserved.
  * See COPYING.txt for license details.
  */
 namespace Icepay\IcpCore\Controller\Checkout;
+
+use Magento\TestFramework\Inspection\Exception;
+use Magento\Checkout\Model\Type\Onepage;
 
 /**
  * Class PlaceOrder
@@ -17,66 +20,82 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
      *
      * @var string
      */
-    protected $_checkoutType = 'Icepay\IcpCore\Model\Checkout\Checkout';
+    protected $checkoutType = 'Icepay\IcpCore\Model\Checkout\Checkout';
 
 
     /**
-     * Submit the order
+     * Start ICEPAY Checkout
      *
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
+        $errorMessage = 'unknown error';
+
         try {
+            $this->initCheckout();
 
-            $this->_initCheckout();
-            if($this->_checkout->initIcepayResult())
-            {
+            $customerData = $this->_customerSession->getCustomerDataObject();
+            $quoteCheckoutMethod = $this->onepage->getCheckoutMethod();
 
-                $this->_getCheckoutSession()->unsIcepayPaymentInProgress();
-                
-                $this->_checkout->place();
 
-                // prepare session to success or cancellation page
-                $this->_getCheckoutSession()->clearHelperData();
+            if (!$customerData->getId() && ((!$quoteCheckoutMethod || $quoteCheckoutMethod != Onepage::METHOD_REGISTER)
+                    && !$this->_objectManager->get('Magento\Checkout\Helper\Data')->isAllowedGuestCheckout(
+                        $this->getQuote(),
+                        $this->getQuote()->getStoreId()
+                    ))
+            ) {
+                $this->messageManager->addNoticeMessage(
+                    __('To check out, please sign in with your email address.')
+                );
 
-                // "last successful quote"
-                $quoteId = $this->_getQuote()->getId();
-                $this->_getCheckoutSession()->setLastQuoteId($quoteId)->setLastSuccessQuoteId($quoteId);
+                $this->_objectManager->get('Magento\Checkout\Helper\ExpressRedirect')->redirectLogin($this);
+                $this->_customerSession->setBeforeAuthUrl($this->_url->getUrl('*/*/*', ['_current' => true]));
 
-                // an order may be created
-                $order = $this->_checkout->getOrder();
-                if ($order) {
-                    $this->_getCheckoutSession()->setLastOrderId($order->getId())
-                        ->setLastRealOrderId($order->getIncrementId())
-                        ->setLastOrderStatus($order->getStatus());
-                }
-
-                $this->_redirect('checkout/onepage/success');
                 return;
             }
-        } catch (ApiProcessableException $e) {
-//            $this->_processIcepayApiError($e); //TODO: implement
-            $this->messageManager->addExceptionMessage(
-                $e,
-                __('ICEPAY Gateway Error')
+
+            //place order
+            $this->checkout->place();
+
+            //Start payment
+            $success = $this->checkout->startPayment(
+                $this->_url->getUrl('*/*/payment'),
+                $this->_url->getUrl('*/*/cancel')
             );
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $this->messageManager->addExceptionMessage(
-                $e,
-                $e->getMessage()
-            );
-//            $this->_redirect('*/*/review');
-            $this->_redirect('/');
-        } catch (\Exception $e) {
-            $this->messageManager->addExceptionMessage(
-                $e,
-                __('We can\'t place the order.')
-            );
-//            $this->_redirect('*/*/review');
-            $this->_redirect('/');
+            $url = $this->checkout->getRedirectUrl();
+            if ($success && $url) {
+                $this->getResponse()->setRedirect($url);
+                return;
+            }
         }
+        catch (\Magento\Framework\Exception\LocalizedException $e) {
+            $errorMessage = $e->getMessage();
+            $this->messageManager->addExceptionMessage($e, $errorMessage);
+        }
+        catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+            $this->messageManager->addExceptionMessage(
+                $e,
+                __('Can\'t start Icepay Checkout. ' . $errorMessage)
+            );
+        }
+
+        if (isset($this->checkout)) {
+
+            // if there is an order - cancel it
+            $orderId = $this->getCheckoutSession()->getLastOrderId();
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $orderId ? $this->_orderFactory->create()->load($orderId) : false;
+            
+            $this->cancelOrder($this->checkout->getOrder(), 'Order was cancelled due to a system error: ' . $errorMessage);
+            $this->messageManager->addErrorMessage(
+                __('Order was cancelled due to a system error.')
+            );
+            $this->getCheckoutSession()->restoreQuote();
+        }
+
+        $this->_redirect('checkout/cart');
     }
 
 

@@ -22,9 +22,39 @@
                                                                 <item name="icepay_icpcore-payments" xsi:type="array">
                                                                     <item name="component" xsi:type="string">Icepay_IcpCore/js/view/payment/icepay-payments</item>
                                                                     <item name="methods" xsi:type="array">
-                                                                        <!--<item name="icepay_icpcore_creditcard" xsi:type="array">-->
-                                                                            <!--<item name="isBillingAddressRequired" xsi:type="boolean">true</item>-->
-                                                                        <!--</item>-->
+                                                                        <item name="icepay_icpcore_creditcard" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">false</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_directdebit" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_giftcard" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_giropay" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_ideal" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_mistercash" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_paypal" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_paysafecard" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_phone" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_sms" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="icepay_icpcore_wiretransfer" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
                                                                     </item>
                                                                 </item>
                                                             </item>

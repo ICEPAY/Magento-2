@@ -7,7 +7,7 @@
                 module="Icepay_IcpCore"
                 sortOrder="50"
                 parent="Magento_Sales::sales"
-                resource="Icepay_IcpCore::icpcore"
+                resource="Icepay_IcpCore::paymentmethod_view"
         />
         <add
                 id="Icepay_IcpCore::paymentmethod"
@@ -16,7 +16,7 @@
                 sortOrder="70"
                 parent="Icepay_IcpCore::icpcore"
                 action="icepay_icpcore/paymentmethod/index"
-                resource="Icepay_IcpCore::paymentmethod"
+                resource="Icepay_IcpCore::paymentmethod_view"
         />
     </menu>
 </config>

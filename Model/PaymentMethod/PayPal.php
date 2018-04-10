@@ -165,6 +165,7 @@ class PayPal extends IcepayAbstractMethod
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\Exception\LocalizedExceptionFactory $exception,
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
+        \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface $transactionManager,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
@@ -188,6 +189,7 @@ class PayPal extends IcepayAbstractMethod
             $resource,
             $resourceCollection,
             $transactionBuilder,
+            $transactionManager,
             $data
         );
         $this->_storeManager = $storeManager;
@@ -275,7 +277,7 @@ class PayPal extends IcepayAbstractMethod
      */
     public function getCheckoutRedirectUrl()
     {
-        return $this->_urlBuilder->getUrl('icepay/checkout/start');
+        return $this->_urlBuilder->getUrl('icepay/checkout/placeorder');
     }
     
     /**

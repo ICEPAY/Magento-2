@@ -8,10 +8,10 @@ namespace Icepay\IcpCore\Model\PaymentMethod;
 
 require_once(dirname(__FILE__).'/../restapi/src/Icepay/API/Autoloader.php');
 
-use Magento\Framework\Webapi\Exception;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
 
 
 class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
@@ -53,10 +53,14 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
     protected $transactionBuilder;
 
     /**
+     * @var ManagerInterface
+     */
+    protected $transactionManager;
+
+    /**
      * @var CountryProvider
      */
     protected $countryProvider;
-
 
 
     public function __construct(
@@ -77,6 +81,7 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
+        \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface $transactionManager,
         array $data = []
     ) {
         parent::__construct(
@@ -97,6 +102,7 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
         $this->filterBuilder = $filterBuilder;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->transactionBuilder = $transactionBuilder;
+        $this->transactionManager = $transactionManager;
         $this->countryProvider = $countryProvider;
 
         $this->_moduleList = $moduleList;
@@ -259,48 +265,37 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $icepayTransactionData = $this->_checkoutSession->getIcepayTransactionData();
-        if (!isset($icepayTransactionData)) {
-            throw new \Exception('ICEPAY result is not set. Order is canceled or already created.');
-        } else {
-            $this->_importToPayment($icepayTransactionData, $payment);
-        }
-
+//        $icepayTransactionData = $this->_checkoutSession->getIcepayTransactionData();
+//        if (!isset($icepayTransactionData)) {
+//            throw new LocalizedException(__('ICEPAY result is not set. Order is canceled or already created.'));
+//        } else {
+//            $this->_importToPayment($icepayTransactionData, $payment);
+//        }
+        
         $order = $payment->getOrder();
-        $orderTransactionId = $payment->getTransactionId();
-
-        $state = \Magento\Sales\Model\Order::STATE_PROCESSING;
-        $status = 'processing';
+        //$orderTransactionId = $payment->getTransactionId().'-order';
 
         $formattedPrice = $order->getBaseCurrency()->formatTxt($amount);
-        if ($payment->getIsTransactionPending()) {
-            $message = __('The ordering amount of %1 is pending approval on the payment gateway.', $formattedPrice);
-            $state = \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT;
-            $order->setIsNotified(false);
-        } else if ($payment->getIsTransactionApproved())
-        {
-            $message = __('Ordered amount of %1', $formattedPrice);
-        }
-        else throw new \Exception('Invalid order status sent');
 
-        $payment->setParentTransactionId($orderTransactionId);
+        
+            $message = __('Ordered amount of %1', $formattedPrice);
+            $state = \Magento\Sales\Model\Order::STATE_NEW;
+            $status = 'icepay_icpcore_new';
+
+
+//        $transactionId = $this->transactionManager->generateTransactionId($payment, Transaction::TYPE_ORDER);
+
 
         $transaction = $this->transactionBuilder->setPayment($payment)
             ->setOrder($order)
-            ->setTransactionId($payment->getTransactionId())
+//            ->setTransactionId($transactionId)
             ->build(Transaction::TYPE_ORDER);
         $payment->addTransactionCommentsToOrder($transaction, $message);
 
-//        $stateObject->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
-//        $stateObject->setStatus('pending_payment');
-//        $stateObject->setIsNotified(false);
-
-
-        $order->setState($state)->setStatus($status);
+        $order->setState($state)
+            ->setStatus($status);
 
         $payment->setSkipOrderProcessing(true);
-
-        $this->_checkoutSession->unsIcepayTransactionData();
 
         return $this;
     }

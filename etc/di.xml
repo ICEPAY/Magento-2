@@ -6,6 +6,7 @@
     <preference for="Icepay\IcpCore\Api\Data\PaymentmethodSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults" />
     <preference for="Icepay\IcpCore\Api\Data\PaymentmethodInterface" type="Icepay\IcpCore\Model\Paymentmethod" />
+    <preference for="Icepay\IcpCore\Api\PostbackNotificationInterface" type="Icepay\IcpCore\Model\PostbackNotification"/>
     <virtualType name="PaymentmethodGridDataProvider" type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
         <arguments>
             <argument name="collection" xsi:type="object" shared="false">Icepay\IcpCore\Model\ResourceModel\Paymentmethod\Collection</argument>
@@ -33,4 +34,48 @@
             <argument name="resourceModel" xsi:type="string">Icepay\IcpCore\Model\ResourceModel\Paymentmethod</argument>
         </arguments>
     </virtualType>
+    <virtualType name="icepayLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers"  xsi:type="array">
+                <item name="debug" xsi:type="object">Icepay\IcpCore\Logger\Handler\Icepay</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Icepay\IcpCore\Model\PostbackNotification">
+        <arguments>
+            <argument name="logger" xsi:type="object">icepayLogger</argument>
+        </arguments>
+    </type>
+    <type name="\Icepay\IcpCore\Controller\AbstractCheckout">
+        <arguments>
+            <argument name="logger" xsi:type="object">icepayLogger</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Webapi\Rest\Request\DeserializerFactory">
+        <arguments>
+            <argument name="deserializers" xsi:type="array">
+                <item name="application_x_www_form_urlencoded" xsi:type="array">
+                    <item name="type" xsi:type="string">application/x-www-form-urlencoded</item>
+                    <item name="model" xsi:type="string">Icepay\IcpCore\Webapi\Rest\Request\Deserializer\XWwwFormUrlencoded</item>
+                </item>
+                <item name="application_json" xsi:type="array">
+                    <item name="type" xsi:type="string">application/json</item>
+                    <item name="model" xsi:type="string">Magento\Framework\Webapi\Rest\Request\Deserializer\Json</item>
+                </item>
+                <item name="application_xml" xsi:type="array">
+                    <item name="type" xsi:type="string">application/xml</item>
+                    <item name="model" xsi:type="string">Magento\Framework\Webapi\Rest\Request\Deserializer\Xml</item>
+                </item>
+                <item name="application_xhtml_xml" xsi:type="array">
+                    <item name="type" xsi:type="string">application/xhtml+xml</item>
+                    <item name="model" xsi:type="string">Magento\Framework\Webapi\Rest\Request\Deserializer\Xml</item>
+                </item>
+                <item name="text_xml" xsi:type="array">
+                    <item name="type" xsi:type="string">text/xml</item>
+                    <item name="model" xsi:type="string">Magento\Framework\Webapi\Rest\Request\Deserializer\Xml</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    
 </config>
