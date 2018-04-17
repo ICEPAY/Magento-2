@@ -48,7 +48,7 @@ class Toggle extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
                 $paymentmethod->setIsActive(!$paymentmethod->getIsActive());
                 $paymentmethod->save();
                 $this->messageManager->addSuccess(__('Payment method successfully saved.'));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->messageManager->addError(__('Error with editing payment method action.'));
             }
         }

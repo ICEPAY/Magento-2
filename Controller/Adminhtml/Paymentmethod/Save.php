@@ -64,7 +64,7 @@ class Save extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
                 if ($this->getRequest()->getParam('back')) {
                     return $resultRedirect->setPath('*/*/edit', ['id' => $paymentmethod->getId()]);
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->messageManager->addError(__('Error with editing payment method action.'));
             }
         }
