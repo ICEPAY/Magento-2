@@ -61,7 +61,6 @@ define(
                 type: 'icepay_icpcore_wiretransfer',
                 component: 'Icepay_IcpCore/js/view/payment/method-renderer/wiretransfer'
             }
-
         );
         /** Add view logic here if needed */
         return Component.extend({});

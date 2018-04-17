@@ -80,6 +80,4 @@ class AbstractConfigProvider implements ConfigProviderInterface
     {
         return $this->method->getPaymentMethodDisplayName();
     }
-
-
 }

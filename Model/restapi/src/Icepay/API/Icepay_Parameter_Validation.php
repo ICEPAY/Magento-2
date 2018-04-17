@@ -10,7 +10,6 @@
 
 namespace Icepay\API;
 
-
 class Icepay_Parameter_Validation
 {
     protected $_version = "1.0.0";

@@ -8,7 +8,8 @@
  * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_Result extends Icepay_Api_Base {
+class Icepay_Result extends Icepay_Api_Base
+{
 
     public function __construct()
     {
@@ -57,8 +58,9 @@
      */
     public function getStatus($includeStatusCode = false)
     {
-        if (!isset($this->data->status))
+        if (!isset($this->data->status)) {
             return null;
+        }
         return ($includeStatusCode) ? sprintf("%s: %s", $this->data->status, $this->data->statusCode) : $this->data->status;
     }
 
@@ -87,8 +89,7 @@
     protected function generateChecksumForPage()
     {
         return sha1(
-                sprintf("%s|%s|%s|%s|%s|%s|%s|%s", $this->_secretCode, $this->data->merchant, $this->data->status, $this->data->statusCode, $this->data->orderID, $this->data->paymentID, $this->data->reference, $this->data->transactionID
-                )
+            sprintf("%s|%s|%s|%s|%s|%s|%s|%s", $this->_secretCode, $this->data->merchant, $this->data->status, $this->data->statusCode, $this->data->orderID, $this->data->paymentID, $this->data->reference, $this->data->transactionID)
         );
     }
 
@@ -104,30 +105,37 @@
     }
 
 
-     /**
-      * Check between ICEPAY statuscodes whether the status can be updated.
-      * @since version 1.0.0
-      * @access public
-      * @param string $currentStatus The ICEPAY statuscode of the order before a statuschange
-      * @return boolean
-      */
-     public function canUpdateStatus($currentStatus)
-     {
-         if (!isset($this->data->status)) {
-             $this->_logger->log("Status not set", Icepay_Api_Logger::ERROR);
-             return false;
-         }
+    /**
+     * Check between ICEPAY statuscodes whether the status can be updated.
+     * @since version 1.0.0
+     * @access public
+     * @param string $currentStatus The ICEPAY statuscode of the order before a statuschange
+     * @return boolean
+     */
+    public function canUpdateStatus($currentStatus)
+    {
+        if (!isset($this->data->status)) {
+            $this->_logger->log("Status not set", Icepay_Api_Logger::ERROR);
+            return false;
+        }
 
-         switch ($this->data->status) {
-             case Icepay_StatusCode::SUCCESS: return ($currentStatus == Icepay_StatusCode::OPEN || $currentStatus == Icepay_StatusCode::AUTHORIZED || $currentStatus == Icepay_StatusCode::VALIDATE);
-             case Icepay_StatusCode::OPEN: return ($currentStatus == Icepay_StatusCode::OPEN);
-             case Icepay_StatusCode::AUTHORIZED: return ($currentStatus == Icepay_StatusCode::OPEN);
-             case Icepay_StatusCode::VALIDATE: return ($currentStatus == Icepay_StatusCode::OPEN);
-             case Icepay_StatusCode::ERROR: return ($currentStatus == Icepay_StatusCode::OPEN || $currentStatus == Icepay_StatusCode::AUTHORIZED || $currentStatus == Icepay_StatusCode::VALIDATE);
-             case Icepay_StatusCode::CHARGEBACK: return ($currentStatus == Icepay_StatusCode::SUCCESS);
-             case Icepay_StatusCode::REFUND: return ($currentStatus == Icepay_StatusCode::SUCCESS);
-             default:
-                 return false;
-         };
-     }
+        switch ($this->data->status) {
+            case Icepay_StatusCode::SUCCESS:
+                return ($currentStatus == Icepay_StatusCode::OPEN || $currentStatus == Icepay_StatusCode::AUTHORIZED || $currentStatus == Icepay_StatusCode::VALIDATE);
+            case Icepay_StatusCode::OPEN:
+                return ($currentStatus == Icepay_StatusCode::OPEN);
+            case Icepay_StatusCode::AUTHORIZED:
+                return ($currentStatus == Icepay_StatusCode::OPEN);
+            case Icepay_StatusCode::VALIDATE:
+                return ($currentStatus == Icepay_StatusCode::OPEN);
+            case Icepay_StatusCode::ERROR:
+                return ($currentStatus == Icepay_StatusCode::OPEN || $currentStatus == Icepay_StatusCode::AUTHORIZED || $currentStatus == Icepay_StatusCode::VALIDATE);
+            case Icepay_StatusCode::CHARGEBACK:
+                return ($currentStatus == Icepay_StatusCode::SUCCESS);
+            case Icepay_StatusCode::REFUND:
+                return ($currentStatus == Icepay_StatusCode::SUCCESS);
+            default:
+                return false;
+        };
+    }
 }

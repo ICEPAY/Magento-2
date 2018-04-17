@@ -24,30 +24,30 @@ define(
 
             issuerList: [],
 
-            getCode: function() {
+            getCode: function () {
                 return 'icepay_icpcore_sms';
             },
 
-            isActive: function() {
+            isActive: function () {
                 return true;
             },
 
             /** Returns payment logo image path */
-            getPaymentLogoSrc: function() {
+            getPaymentLogoSrc: function () {
                 return window.checkoutConfig.payment.icepay.sms.paymentMethodLogoSrc;
             },
 
-            getPaymentMethodDisplayName: function() {
+            getPaymentMethodDisplayName: function () {
                 return window.checkoutConfig.payment.icepay.sms.getPaymentMethodDisplayName;
             },
             
-            selectPaymentMethod: function() {
+            selectPaymentMethod: function () {
                 selectPaymentMethodAction(this.getData());
                 checkoutData.setSelectedPaymentMethod(this.item.method);
                 return true;
             },
             
-            getData: function() {
+            getData: function () {
                 var parent = this._super(),
                     additionalData = {};
 
@@ -60,3 +60,4 @@ define(
         });
     }
 );
+

@@ -19,7 +19,6 @@ class Cancel extends \Icepay\IcpCore\Controller\AbstractCheckout
     public function execute()
     {
         try {
-
             //TODO: check if payment was canceled or failed
 
 
@@ -49,6 +48,4 @@ class Cancel extends \Icepay\IcpCore\Controller\AbstractCheckout
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         return $resultRedirect->setPath('checkout/cart');
     }
-
-
 }

@@ -10,7 +10,7 @@ namespace Icepay\IcpCore\Model\ConfigProvider;
 class MisterCash extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\MisterCash::CODE;
 
@@ -32,5 +32,4 @@ class MisterCash extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

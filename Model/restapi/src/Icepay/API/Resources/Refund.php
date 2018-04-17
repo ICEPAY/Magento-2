@@ -19,12 +19,12 @@ class Refund extends BaseApi
         /**
          * Information for starting the refund
          */
-        $information = array(
+        $information = [
             'Timestamp' => $this->getTimeStamp(),
             'PaymentID' => $data['PaymentID'],
             'RefundAmount' => $data['Amount'],
             'RefundCurrency' => $data['Currency']
-        );
+        ];
 
         /**
          * Generate the checksum for the request
@@ -53,11 +53,11 @@ class Refund extends BaseApi
         /**
          * Information for cancelling the refund
          */
-        $information = array(
+        $information = [
             'Timestamp' => $this->getTimeStamp(),
             'RefundID' => $data['RefundID'],
             'PaymentID' => $data['PaymentID']
-        );
+        ];
 
         /**
          * Generate the checksum for the request
@@ -86,10 +86,10 @@ class Refund extends BaseApi
         /**
          * Information for cancelling the refund
          */
-        $information = array(
+        $information = [
             'Timestamp' => $this->getTimeStamp(),
             'PaymentID' => $data['PaymentID']
-        );
+        ];
 
         /**
          * Generate the checksum for the request

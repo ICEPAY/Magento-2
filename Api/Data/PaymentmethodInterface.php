@@ -161,7 +161,4 @@ interface PaymentmethodInterface
      * @return $this
      */
     public function setRawPmData($rawPmData);
-
-
-
 }

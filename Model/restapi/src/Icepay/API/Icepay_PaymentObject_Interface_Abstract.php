@@ -8,7 +8,8 @@
  * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
  */
 
- interface Icepay_PaymentObject_Interface_Abstract {
+interface Icepay_PaymentObject_Interface_Abstract
+{
 
     public function setData($data);
 
@@ -51,7 +52,8 @@
     public function getDescription();
 }
 
-interface Icepay_Basic_Paymentmethod_Interface_Abstract {
+interface Icepay_Basic_Paymentmethod_Interface_Abstract
+{
 
     public function getCode();
 
@@ -68,7 +70,8 @@ interface Icepay_Basic_Paymentmethod_Interface_Abstract {
     public function getSupportedAmountRange();
 }
 
-interface Icepay_WebserviceTransaction_Interface_Abstract {
+interface Icepay_WebserviceTransaction_Interface_Abstract
+{
 
     public function setData($data);
 

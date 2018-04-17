@@ -17,7 +17,8 @@ require([
 ], function (jQuery, tinyMCE, confirm) {
     'use strict';
 
-    function syncPaymentMethods(url) {
+    function syncPaymentMethods(url)
+    {
         confirm({
             content: 'Are you sure you want to retrieve payment method information from ICEPAY payment gateway?',
             actions: {

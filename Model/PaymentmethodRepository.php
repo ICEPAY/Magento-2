@@ -65,15 +65,15 @@ class PaymentmethodRepository implements PaymentmethodRepositoryInterface
      * @param DataObjectProcessor $dataObjectProcessor
      */
     public function __construct(
-          ResourcePaymentmethod $resource,
-          PaymentmethodFactory $paymentmethodFactory,
+        ResourcePaymentmethod $resource,
+        PaymentmethodFactory $paymentmethodFactory,
         \Icepay\IcpCore\Api\Data\PaymentmethodInterfaceFactory $dataPaymentmethodFactory,
         PaymentmethodCollectionFactory $paymentmethodCollectionFactory,
         Data\PaymentmethodSearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor
-    )
-    {
+    ) {
+    
         $this->resource = $resource;
         $this->paymentmethodFactory = $paymentmethodFactory;
         $this->paymentmethodCollectionFactory = $paymentmethodCollectionFactory;
@@ -211,5 +211,4 @@ class PaymentmethodRepository implements PaymentmethodRepositoryInterface
     {
         return $this->delete($this->getById($paymentmethodId));
     }
-
 }

@@ -186,7 +186,6 @@ class GiroPay extends IcepayAbstractMethod
         $this->_exception = $exception;
         $this->transactionRepository = $transactionRepository;
         $this->issuerFactory = $issuerFactory;
-
     }
 
 
@@ -194,17 +193,15 @@ class GiroPay extends IcepayAbstractMethod
     {
         $list = parent::getIssuerList(GiroPay::PMCODE);
 
-        $arr = array();
-        foreach($list as $issuer)
-        {
-            array_push($arr,[
+        $arr = [];
+        foreach ($list as $issuer) {
+            array_push($arr, [
                 'name' => $issuer->Description,
                 'code' => $issuer->IssuerKeyword,
             ]);
         }
 
         return $arr;
-
     }
 
 
@@ -219,7 +216,4 @@ class GiroPay extends IcepayAbstractMethod
     {
         return $this->_urlBuilder->getUrl('icepay/checkout/placeorder');
     }
-
-    
-
 }

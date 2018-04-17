@@ -26,11 +26,12 @@ class UpgradeData implements UpgradeDataInterface
         $setup->startSetup();
 
         if (version_compare($context->getVersion(), '1.0.2') < 0) {
-
             //NEW
             $select = $setup->getConnection()->select()
                 ->from(
-                    $setup->getTable('sales_order_status'), ['status',])
+                    $setup->getTable('sales_order_status'),
+                    ['status',]
+                )
                 ->where('status = ?', 'icepay_icpcore_new');
 
             if (count($setup->getConnection()->fetchAll($select)) == 0) {
@@ -55,7 +56,9 @@ class UpgradeData implements UpgradeDataInterface
             //OPEN
             $select = $setup->getConnection()->select()
                 ->from(
-                    $setup->getTable('sales_order_status'), ['status',])
+                    $setup->getTable('sales_order_status'),
+                    ['status',]
+                )
                 ->where('status = ?', 'icepay_icpcore_open');
 
             if (count($setup->getConnection()->fetchAll($select)) == 0) {
@@ -80,7 +83,9 @@ class UpgradeData implements UpgradeDataInterface
             //OK
             $select = $setup->getConnection()->select()
                 ->from(
-                    $setup->getTable('sales_order_status'), ['status',])
+                    $setup->getTable('sales_order_status'),
+                    ['status',]
+                )
                 ->where('status = ?', 'icepay_icpcore_ok');
 
             if (count($setup->getConnection()->fetchAll($select)) == 0) {
@@ -105,7 +110,9 @@ class UpgradeData implements UpgradeDataInterface
             //ERROR
             $select = $setup->getConnection()->select()
                 ->from(
-                    $setup->getTable('sales_order_status'), ['status',])
+                    $setup->getTable('sales_order_status'),
+                    ['status',]
+                )
                 ->where('status = ?', 'icepay_icpcore_error');
 
             if (count($setup->getConnection()->fetchAll($select)) == 0) {
@@ -126,12 +133,8 @@ class UpgradeData implements UpgradeDataInterface
                     ]
                 );
             }
-
         }
 
         $setup->endSetup();
-
     }
-
-
 }

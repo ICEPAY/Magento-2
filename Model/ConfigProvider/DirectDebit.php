@@ -10,7 +10,7 @@ namespace Icepay\IcpCore\Model\ConfigProvider;
 class DirectDebit extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\DirectDebit::CODE;
 
@@ -32,5 +32,4 @@ class DirectDebit extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

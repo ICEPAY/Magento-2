@@ -64,18 +64,15 @@ class SyncButton implements ButtonProviderInterface
      */
     public function getSyncUrl()
     {
-        $params = array('_current' => true);
+        $params = ['_current' => true];
 
         if ($this->context->getRequest()->getParam('store')) {
             $params['store'] = (int)$this->context->getRequest()->getParam('store');
-        }
-        else if ($this->context->getRequest()->getParam('website'))
-        {
+        } elseif ($this->context->getRequest()->getParam('website')) {
             $params['website'] = (int)$this->context->getRequest()->getParam('website');
         }
 
         return $this->getUrl('*/*/sync', $params);
-
     }
 
     /**
@@ -89,6 +86,4 @@ class SyncButton implements ButtonProviderInterface
     {
         return $this->context->getUrlBuilder()->getUrl($route, $params);
     }
-
-
 }

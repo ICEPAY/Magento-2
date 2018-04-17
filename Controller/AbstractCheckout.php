@@ -118,8 +118,6 @@ abstract class AbstractCheckout extends AppAction implements RedirectLoginInterf
         \Magento\Checkout\Model\Cart $cart,
         \Magento\Checkout\Model\Type\Onepage $onepage,
         \Psr\Log\LoggerInterface $logger
-
-
     ) {
         $this->_customerSession = $customerSession;
         $this->_checkoutSession = $checkoutSession;
@@ -244,7 +242,4 @@ abstract class AbstractCheckout extends AppAction implements RedirectLoginInterf
         }
         return false;
     }
-
-
-
 }

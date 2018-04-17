@@ -9,7 +9,8 @@
  */
 
 
- class Icepay_Webservice_Base extends Icepay_Api_Base {
+class Icepay_Webservice_Base extends Icepay_Api_Base
+{
 
     protected $service = 'https://connect.icepay.com/webservice/icepay.svc?wsdl';
     protected $client;
@@ -24,8 +25,9 @@
     public function setupClient()
     {
         /* Return if already set */
-        if ($this->client)
+        if ($this->client) {
             return $this;
+        }
 
         /* Start a new client */
         $this->client = new Icepay\API\Client();
@@ -70,13 +72,15 @@
      * @param array $order !required
      * @return object $obj
      */
-    public function arrangeObject($object, $order = array())
+    public function arrangeObject($object, $order = [])
     {
 
-        if (!is_object($object))
+        if (!is_object($object)) {
             throw new Exception("Please provide a valid Object for the arrangeObject method");
-        if (!is_array($order) || empty($order))
+        }
+        if (!is_array($order) || empty($order)) {
             throw new Exception("Please provide a valid orderArray for the arrangeObject method");
+        }
 
         $obj = new stdClass();
 
@@ -97,11 +101,12 @@
      * @param array $order !required if $arrange == true
      * @return object $obj
      */
-    public function parseForChecksum($mainObject, $subObject, $arrange = false, $order = array())
+    public function parseForChecksum($mainObject, $subObject, $arrange = false, $order = [])
     {
 
-        if (!is_object($mainObject))
+        if (!is_object($mainObject)) {
             throw new Exception("Please provide a valid Object");
+        }
 
         $mainObject = $mainObject;
 
@@ -138,21 +143,22 @@
      * @param bool $isautocheckout
      * @return string
      */
-    public function generateChecksum($obj = null, $secretCode = null,$isautocheckout = false)
+    public function generateChecksum($obj = null, $secretCode = null, $isautocheckout = false)
     {
-        $arr = array();
-        if ($secretCode)
+        $arr = [];
+        if ($secretCode) {
             array_push($arr, $secretCode);
+        }
 
         foreach ($obj as $val) {
             $insert = $val;
 
             if (is_bool($val)) {
                 if ($isautocheckout) {
-					$insert = ($val) ? 'True' : 'False';	// autocheckout function computes boolean checksum differently (first character uppercase)
-				} else {
-					$insert = ($val) ? 'true' : 'false';
-				}
+                    $insert = ($val) ? 'True' : 'False';    // autocheckout function computes boolean checksum differently (first character uppercase)
+                } else {
+                    $insert = ($val) ? 'true' : 'false';
+                }
             }
 
             array_push($arr, $insert);
@@ -171,12 +177,12 @@
      */
     protected function forceArray($obj)
     {
-        if (is_array($obj))
+        if (is_array($obj)) {
             return $obj;
+        }
 
-        $arr = array();
+        $arr = [];
         array_push($arr, $obj);
         return $arr;
     }
-
 }

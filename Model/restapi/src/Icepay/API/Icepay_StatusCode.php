@@ -7,7 +7,8 @@
  * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_StatusCode {
+class Icepay_StatusCode
+{
 
     const OPEN = "OPEN";
     const AUTHORIZED = "AUTHORIZED";
@@ -16,5 +17,4 @@
     const SUCCESS = "OK";
     const REFUND = "REFUND";
     const CHARGEBACK = "CBACK";
-
 }

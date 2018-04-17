@@ -13,8 +13,8 @@ define(
         'Icepay_IcpCore/js/action/set-payment-method',
         'Magento_Checkout/js/model/payment/additional-validators'
     ],
-    function ($, Component, setPaymentMethodAction, additionalValidators)
-    {
+    function ($, Component, setPaymentMethodAction, additionalValidators) {
+    
         'use strict';
 
         return Component.extend({
@@ -31,3 +31,4 @@ define(
         });
     }
 );
+

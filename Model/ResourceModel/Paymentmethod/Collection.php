@@ -6,20 +6,24 @@
  */
  
 namespace Icepay\IcpCore\Model\ResourceModel\Paymentmethod;
+
 /**
  * Subscription Collection
  */
 class Collection extends
-    \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
+ \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
     /**
      * Initialize resource collection
      *
      * @return void
      */
-    public function _construct() {
-        $this->_init('Icepay\IcpCore\Model\Paymentmethod',
-            'Icepay\IcpCore\Model\ResourceModel\Paymentmethod');
+    public function _construct()
+    {
+        $this->_init(
+            'Icepay\IcpCore\Model\Paymentmethod',
+            'Icepay\IcpCore\Model\ResourceModel\Paymentmethod'
+        );
     }
 
     protected $_idFieldName = 'paymentmethod_id';
@@ -78,5 +82,4 @@ class Collection extends
 //
 //        return $this;
 //    }
-
 }

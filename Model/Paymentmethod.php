@@ -24,10 +24,15 @@ class Paymentmethod extends \Magento\Framework\Model\AbstractModel implements Pa
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection =
         null,
         array $data = []
-    )
-    {
-        parent::__construct($context, $registry, $resource,
-            $resourceCollection, $data);
+    ) {
+    
+        parent::__construct(
+            $context,
+            $registry,
+            $resource,
+            $resourceCollection,
+            $data
+        );
     }
 
     public function _construct()
@@ -47,9 +52,7 @@ class Paymentmethod extends \Magento\Framework\Model\AbstractModel implements Pa
             $icepay->setCompletedURL('...');
             $icepay->setErrorURL('...');
             return $icepay->payment->getMyPaymentMethods();
-
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }

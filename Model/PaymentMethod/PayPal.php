@@ -7,7 +7,6 @@
  
 namespace Icepay\IcpCore\Model\PaymentMethod;
 
-
 use Icepay\IcpCore\Model\Icepay;
 use Icepay\IcpCore\Model\Issuer;
 use Icepay\IcpCore\Model\Paymentmethod;
@@ -201,7 +200,6 @@ class PayPal extends IcepayAbstractMethod
         $this->transactionRepository = $transactionRepository;
         $this->issuerFactory = $issuerFactory;
 //        $this->transactionBuilder = $transactionBuilder;
-
     }
 
 
@@ -257,17 +255,15 @@ class PayPal extends IcepayAbstractMethod
     {
         $list = parent::getIssuerList(PayPal::PMCODE);
 
-        $arr = array();
-        foreach($list as $issuer)
-        {
-            array_push($arr,[
+        $arr = [];
+        foreach ($list as $issuer) {
+            array_push($arr, [
                 'name' => $issuer->Description,
                 'code' => $issuer->IssuerKeyword,
             ]);
         }
 
         return $arr;
-
     }
     
     /**
@@ -308,5 +304,4 @@ class PayPal extends IcepayAbstractMethod
     {
         return $this->_placeOrder($payment, $amount);
     }
-
 }

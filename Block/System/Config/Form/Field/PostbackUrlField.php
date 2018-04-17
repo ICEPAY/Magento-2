@@ -26,6 +26,5 @@ class PostbackUrlField extends \Magento\Config\Block\System\Config\Form\Field
         $element->setReadonly('readonly');
 
         return $element->getElementHtml();
-
     }
 }

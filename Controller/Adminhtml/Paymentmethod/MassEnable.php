@@ -38,8 +38,8 @@ class MassEnable extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
         \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory,
         \Magento\Ui\Component\MassAction\Filter $filter,
         \Icepay\IcpCore\Model\ResourceModel\Paymentmethod\CollectionFactory $collectionFactory
-    )
-    {
+    ) {
+    
         $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
         parent::__construct($context, $resultPageFactory, $resultForwardFactory);
@@ -74,5 +74,4 @@ class MassEnable extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
     {
         return $this->_authorization->isAllowed('Icepay_IcpCore::paymentmethod_save');
     }
-
 }

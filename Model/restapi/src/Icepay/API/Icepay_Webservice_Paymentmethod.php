@@ -8,7 +8,8 @@
  * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering {
+class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
+{
 
     protected $_methodData;
     protected $_issuerData;
@@ -25,8 +26,9 @@
      */
     public function selectPaymentMethodByCode($name)
     {
-        if (!isset($this->_paymentMethodsArray))
+        if (!isset($this->_paymentMethodsArray)) {
             throw new Exception("No data loaded");
+        }
         foreach ($this->_paymentMethodsArray as $paymentMethod) {
             if ($paymentMethod->PaymentMethodCode == strtoupper($name)) {
                 $this->_methodData = $paymentMethod;
@@ -47,8 +49,9 @@
      */
     public function selectIssuerByKeyword($name)
     {
-        if (!isset($this->_paymentMethodsArray))
+        if (!isset($this->_paymentMethodsArray)) {
             throw new Exception("No data loaded");
+        }
         foreach ($this->_paymentMethodsArray as $paymentMethod) {
             foreach ($paymentMethod->Issuers as $issuer) {
                 if ($issuer->IssuerKeyword == strtoupper($name)) {
@@ -122,8 +125,9 @@
      */
     public function getIssuers()
     {
-        if (!isset($this->_methodData))
+        if (!isset($this->_methodData)) {
             throw new Exception("Paymentmethod must be selected first");
+        }
         return $this->_methodData->Issuers;
     }
 
@@ -137,16 +141,18 @@
      */
     public function getCurrencies()
     {
-        if (!isset($this->_issuerData))
+        if (!isset($this->_issuerData)) {
             throw new Exception("Issuer must be selected first");
-        if (!isset($this->_country))
+        }
+        if (!isset($this->_country)) {
             throw new Exception("Country must be selected first");
+        }
         foreach ($this->_issuerData["Countries"] as $country) {
             if ($this->_country == $country["CountryCode"]) {
                 return $country["Currencies"];
             }
         }
-        return array();
+        return [];
     }
 
     /**
@@ -159,9 +165,10 @@
      */
     public function getCountries()
     {
-        if (!isset($this->_issuerData))
+        if (!isset($this->_issuerData)) {
             throw new Exception("Issuer must be selected first");
-        $countries = array();
+        }
+        $countries = [];
         foreach ($this->_issuerData["Countries"] as $country) {
             array_push($countries, $country["CountryCode"]);
         }
@@ -178,10 +185,12 @@
      */
     public function getMinimumAmount()
     {
-        if (!isset($this->_issuerData))
+        if (!isset($this->_issuerData)) {
             throw new Exception("Issuer must be selected first");
-        if (!isset($this->_country))
+        }
+        if (!isset($this->_country)) {
             throw new Exception("Country must be selected first");
+        }
         foreach ($this->_issuerData["Countries"] as $country) {
             if ($this->_country == $country["CountryCode"]) {
                 return intval($country["MinimumAmount"]);
@@ -199,10 +208,12 @@
      */
     public function getMaximumAmount()
     {
-        if (!isset($this->_issuerData))
+        if (!isset($this->_issuerData)) {
             throw new Exception("Issuer must be selected first");
-        if (!isset($this->_country))
+        }
+        if (!isset($this->_country)) {
             throw new Exception("Country must be selected first");
+        }
         foreach ($this->_issuerData["Countries"] as $country) {
             if ($this->_country == $country["CountryCode"]) {
                 return intval($country["MaximumAmount"]);
@@ -221,9 +232,9 @@
      */
     protected function validateCountry($country)
     {
-        if (strlen($country) != 2)
+        if (strlen($country) != 2) {
             throw new Exception("Country must be ISO 3166-1 alpha-2");
+        }
         return strtoupper($country);
     }
-
 }

@@ -10,7 +10,7 @@ namespace Icepay\IcpCore\Model\ConfigProvider;
 class GiroPay extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\GiroPay::CODE;
 
@@ -32,5 +32,4 @@ class GiroPay extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

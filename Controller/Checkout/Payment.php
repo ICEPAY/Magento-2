@@ -21,11 +21,11 @@ class Payment extends \Icepay\IcpCore\Controller\AbstractCheckout
 
 
         /**
-     * Submit the order
-     *
-     * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
+         * Submit the order
+         *
+         * @return void
+         * @throws \Magento\Framework\Exception\LocalizedException
+         */
     public function execute()
     {
         try {
@@ -53,8 +53,6 @@ class Payment extends \Icepay\IcpCore\Controller\AbstractCheckout
                 $this->_redirect('checkout/onepage/success');
                 return;
             }
-
-
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->logger->debug("Payment.php: ".$e->getMessage());
             $this->messageManager->addExceptionMessage(
@@ -72,6 +70,4 @@ class Payment extends \Icepay\IcpCore\Controller\AbstractCheckout
 
         $this->_redirect('/');
     }
-
-
 }

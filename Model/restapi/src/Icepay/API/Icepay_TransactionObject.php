@@ -7,7 +7,8 @@
  * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_TransactionObject implements Icepay_WebserviceTransaction_Interface_Abstract {
+class Icepay_TransactionObject implements Icepay_WebserviceTransaction_Interface_Abstract
+{
 
     protected $data;
 

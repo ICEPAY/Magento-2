@@ -10,7 +10,7 @@ namespace Icepay\IcpCore\Model\ConfigProvider;
 class PayPal extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\PayPal::CODE;
 
@@ -32,5 +32,4 @@ class PayPal extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

@@ -85,6 +85,4 @@ class Website extends Column
             $this->_data['config']['componentDisabled'] = true;
         }
     }
-
-
 }

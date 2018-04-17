@@ -86,5 +86,4 @@ class StoreView extends Column
             $this->_data['config']['componentDisabled'] = true;
         }
     }
-
 }

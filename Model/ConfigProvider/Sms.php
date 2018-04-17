@@ -10,7 +10,7 @@ namespace Icepay\IcpCore\Model\ConfigProvider;
 class Sms extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\Sms::CODE;
 
@@ -32,5 +32,4 @@ class Sms extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

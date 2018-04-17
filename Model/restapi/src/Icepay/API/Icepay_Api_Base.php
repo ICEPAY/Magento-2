@@ -7,7 +7,8 @@
  * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_Api_Base {
+class Icepay_Api_Base
+{
 
     private $_pinCode;
     protected $_merchantID;
@@ -18,8 +19,8 @@
     protected $_language = null;
     protected $_currency = null;
     protected $_version = "1.0.2";
-    protected $_doIPCheck = array();
-    protected $_whiteList = array();
+    protected $_doIPCheck = [];
+    protected $_whiteList = [];
     protected $data;
     protected $_logger;
 
@@ -40,8 +41,9 @@
     public function exists($needle, $haystack = null)
     {
         $result = true;
-        if ($haystack && $result && $haystack[0] != "00")
+        if ($haystack && $result && $haystack[0] != "00") {
             $result = in_array($needle, $haystack);
+        }
         return $result;
     }
 
@@ -64,8 +66,9 @@
      */
     public function setMerchantID($merchantID)
     {
-        if (!\Icepay\API\Icepay_Parameter_Validation::merchantID($merchantID))
+        if (!\Icepay\API\Icepay_Parameter_Validation::merchantID($merchantID)) {
             throw new Exception('MerchantID not valid');
+        }
 
         $this->_merchantID = (int) $merchantID;
 
@@ -91,8 +94,9 @@
      */
     public function setSecretCode($secretCode)
     {
-        if (!\Icepay\API\Icepay_Parameter_Validation::secretCode($secretCode))
+        if (!\Icepay\API\Icepay_Parameter_Validation::secretCode($secretCode)) {
             throw new Exception('Secretcode not valid');
+        }
 
         $this->_secretCode = (string) $secretCode;
         return $this;
@@ -117,8 +121,9 @@
      */
     public function setPinCode($pinCode)
     {
-        if (!\Icepay\API\Icepay_Parameter_Validation::pinCode($pinCode))
+        if (!\Icepay\API\Icepay_Parameter_Validation::pinCode($pinCode)) {
             throw new Exception('Pincode not valid');
+        }
 
         $this->_pinCode = (string) $pinCode;
 
@@ -144,8 +149,9 @@
      */
     public function setSuccessURL($url = "")
     {
-        if (!isset($this->data))
+        if (!isset($this->data)) {
             $this->data = new stdClass();
+        }
 
         $this->data->ic_urlcompleted = $url;
 
@@ -160,8 +166,9 @@
      */
     public function setErrorURL($url = "")
     {
-        if (!isset($this->data))
+        if (!isset($this->data)) {
             $this->data = new stdClass();
+        }
 
         $this->data->ic_urlerror = $url;
         return $this;
@@ -193,5 +200,4 @@
     {
         return gmdate("Y-m-d\TH:i:s\Z");
     }
-
 }

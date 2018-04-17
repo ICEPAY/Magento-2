@@ -362,7 +362,6 @@ class Checkout
         /** @var \Magento\Sales\Model\Order $order */
         $order = $orderId ? $this->_orderFactory->create()->load($orderId) : false;
         if ($order && $order->getId() && $order->getQuoteId() == $this->_getCheckoutSession()->getQuoteId()) {
-
             $this->quote = $this->quoteRepository->get($order->getQuoteId()); //TODO
 
 
@@ -450,8 +449,7 @@ class Checkout
      */
     protected function getIcepayApiPaymentObject()
     {
-        if (null === $this->paymentObject)
-        {
+        if (null === $this->paymentObject) {
             $this->paymentObject = $this->_objectManager->get('Icepay_PaymentObject');
         }
         return $this->paymentObject;
@@ -556,6 +554,4 @@ class Checkout
             ->setCustomerGroupId(\Magento\Customer\Model\Group::NOT_LOGGED_IN_ID);
         return $this;
     }
-
-
 }

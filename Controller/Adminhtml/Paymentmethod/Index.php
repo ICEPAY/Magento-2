@@ -7,7 +7,6 @@
 
 namespace Icepay\IcpCore\Controller\Adminhtml\Paymentmethod;
 
-
 class Index extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
 {
     public function execute()
@@ -27,5 +26,4 @@ class Index extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
 
         return $resultPage;
     }
-
 }

@@ -10,7 +10,7 @@ namespace Icepay\IcpCore\Model\ConfigProvider;
 class WireTransfer extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\WireTransfer::CODE;
 
@@ -32,5 +32,4 @@ class WireTransfer extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

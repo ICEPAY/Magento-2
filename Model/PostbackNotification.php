@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 
-
 class PostbackNotification implements PostbackNotificationInterface
 {
 
@@ -86,8 +85,8 @@ class PostbackNotification implements PostbackNotificationInterface
         \Magento\Framework\Webapi\Request $request,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         LoggerInterface $logger
-    )
-    {
+    ) {
+    
         $this->scopeConfig = $scopeConfig;
         $this->encryptor = $encryptor;
         $this->order = $order;
@@ -98,9 +97,6 @@ class PostbackNotification implements PostbackNotificationInterface
         $this->logger = $logger;
 
         $this->icepayPostback = $this->objectManager->create('Icepay_Postback');
-
-
-
     }
 
 
@@ -113,7 +109,6 @@ class PostbackNotification implements PostbackNotificationInterface
     {
 
         try {
-
             $this->logger->debug("*******[ICEPAY] Postback\Notification*******");
             $this->logger->debug('request => ' . print_r($this->request, true));
 
@@ -146,7 +141,7 @@ class PostbackNotification implements PostbackNotificationInterface
 
             $currentIcepayOrderStatus = $this->getIcepayOrderStatus($this->order->getStatus());
 
-            if(($currentIcepayOrderStatus === "NEW" || $this->icepayPostback->canUpdateStatus($currentIcepayOrderStatus)) && $this->icepayPostback->getStatus() !== $currentIcepayOrderStatus) {
+            if (($currentIcepayOrderStatus === "NEW" || $this->icepayPostback->canUpdateStatus($currentIcepayOrderStatus)) && $this->icepayPostback->getStatus() !== $currentIcepayOrderStatus) {
                 switch ($this->icepayPostback->getStatus()) {
                     case Icepay_StatusCode::OPEN:
                         $this->order->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
@@ -191,8 +186,7 @@ class PostbackNotification implements PostbackNotificationInterface
                 }
             }
 
-            if(!$this->order->getIsNotified())
-            {
+            if (!$this->order->getIsNotified()) {
                 $this->orderSender->send($this->order, true);
 
                 $history = $this->order->addStatusHistoryComment(__(
@@ -221,15 +215,10 @@ class PostbackNotification implements PostbackNotificationInterface
                         ->save();
                 }
             }
-
-
-        }
-        catch (\Magento\Framework\Webapi\Exception $e)
-        {
+        } catch (\Magento\Framework\Webapi\Exception $e) {
             $this->logger->error($e->getMessage());
             throw $e;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->critical($e);
 
             throw new \Magento\Framework\Webapi\Exception(
@@ -257,19 +246,21 @@ class PostbackNotification implements PostbackNotificationInterface
      */
     private function getIcepayOrderStatus($magentoOrderStatus)
     {
-        switch ($magentoOrderStatus)
-        {
-            case "icepay_icpcore_new": return "NEW";
-            case "icepay_icpcore_open": return Icepay_StatusCode::OPEN;
-            case "icepay_icpcore_ok": return Icepay_StatusCode::SUCCESS;
-            case "icepay_icpcore_error": return Icepay_StatusCode::ERROR;
+        switch ($magentoOrderStatus) {
+            case "icepay_icpcore_new":
+                return "NEW";
+            case "icepay_icpcore_open":
+                return Icepay_StatusCode::OPEN;
+            case "icepay_icpcore_ok":
+                return Icepay_StatusCode::SUCCESS;
+            case "icepay_icpcore_error":
+                return Icepay_StatusCode::ERROR;
             default:
                 throw new \Magento\Framework\Webapi\Exception(
-                __(sprintf('No mapping found for status: ', $magentoOrderStatus)),
-                0,
-                \Magento\Framework\Webapi\Exception::HTTP_NOT_FOUND
-            );
+                    __(sprintf('No mapping found for status: ', $magentoOrderStatus)),
+                    0,
+                    \Magento\Framework\Webapi\Exception::HTTP_NOT_FOUND
+                );
         }
     }
-
 }

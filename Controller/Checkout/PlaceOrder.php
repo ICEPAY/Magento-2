@@ -69,12 +69,10 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
                 $this->getResponse()->setRedirect($url);
                 return;
             }
-        }
-        catch (\Magento\Framework\Exception\LocalizedException $e) {
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $errorMessage = $e->getMessage();
             $this->messageManager->addExceptionMessage($e, $errorMessage);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
             $this->messageManager->addExceptionMessage(
                 $e,
@@ -83,7 +81,6 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
         }
 
         if (isset($this->checkout)) {
-
             // if there is an order - cancel it
             $orderId = $this->getCheckoutSession()->getLastOrderId();
             /** @var \Magento\Sales\Model\Order $order */
@@ -98,6 +95,4 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
 
         $this->_redirect('checkout/cart');
     }
-
-
 }

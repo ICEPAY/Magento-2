@@ -48,10 +48,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'paymentmethod_id',
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             );
-
         }
 
         $setup->endSetup();
-
     }
 }

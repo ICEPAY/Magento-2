@@ -10,7 +10,7 @@ namespace Icepay\IcpCore\Model\ConfigProvider;
 class IDeal extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\IDeal::CODE;
 
@@ -32,5 +32,4 @@ class IDeal extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

@@ -8,7 +8,8 @@
  * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_PaymentObject implements Icepay_PaymentObject_Interface_Abstract {
+class Icepay_PaymentObject implements Icepay_PaymentObject_Interface_Abstract
+{
 
     protected $data;
     protected $api_type = "webservice";
@@ -28,8 +29,9 @@
 
     public static function getInstance()
     {
-        if (!self::$instance)
+        if (!self::$instance) {
             self::$instance = new self();
+        }
         return self::$instance;
     }
 
@@ -63,8 +65,9 @@
     protected function loadBasicPaymentMethodClass()
     {
 
-        if (!class_exists("Icepay_Api_Basic"))
+        if (!class_exists("Icepay_Api_Basic")) {
             return $this;
+        }
 
         $this->pm_class = Icepay_Api_Basic::getInstance()
                 ->readFolder()
@@ -97,8 +100,9 @@
     public function setCountry($country)
     {
         $country = strtoupper($country);
-        if (!\Icepay\API\Icepay_Parameter_Validation::country($country))
+        if (!\Icepay\API\Icepay_Parameter_Validation::country($country)) {
             throw new Exception('Country not valid');
+        }
         $this->data->ic_country = $country;
         return $this;
     }
@@ -125,8 +129,9 @@
      */
     public function setLanguage($lang)
     {
-        if (!\Icepay\API\Icepay_Parameter_Validation::language($lang))
+        if (!\Icepay\API\Icepay_Parameter_Validation::language($lang)) {
             throw new Exception('Language not valid');
+        }
         $this->data->ic_language = $lang;
         return $this;
     }
@@ -141,8 +146,9 @@
     {
         $amount = (int) (string) $amount;
 
-        if (!\Icepay\API\Icepay_Parameter_Validation::amount($amount))
+        if (!\Icepay\API\Icepay_Parameter_Validation::amount($amount)) {
             throw new Exception('Amount not valid');
+        }
         $this->data->ic_amount = $amount;
         return $this;
     }
@@ -263,5 +269,4 @@
     {
         return $this->data->ic_xml;
     }
-
 }

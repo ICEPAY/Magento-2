@@ -10,7 +10,7 @@ namespace Icepay\IcpCore\Model\ConfigProvider;
 class Phone extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\Phone::CODE;
 
@@ -32,5 +32,4 @@ class Phone extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

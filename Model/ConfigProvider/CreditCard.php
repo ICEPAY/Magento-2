@@ -32,6 +32,4 @@ class CreditCard extends AbstractConfigProvider
             ],
         ] : [];
     }
-    
-
 }

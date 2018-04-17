@@ -63,7 +63,6 @@ class Edit extends Container
         } else {
             $this->buttonList->remove('save');
         }
-
     }
 
     /**

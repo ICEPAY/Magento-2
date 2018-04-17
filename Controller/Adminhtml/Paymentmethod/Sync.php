@@ -10,7 +10,6 @@ namespace Icepay\IcpCore\Controller\Adminhtml\Paymentmethod;
 use Icepay\IcpCore\Api\Data;
 use Icepay\IcpCore\Api;
 
-
 class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
 {
 
@@ -73,8 +72,8 @@ class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
         \Icepay\IcpCore\Model\PaymentmethodFactory $paymentmethodFactory,
         \Icepay\IcpCore\Model\IssuerFactory $issuerFactory,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor
-    )
-    {
+    ) {
+    
         parent::__construct($context, $resultPageFactory, $resultForwardFactory);
         $this->_scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -91,20 +90,21 @@ class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
     public function execute()
     {
 
-        $storeIds = array();
+        $storeIds = [];
         $redirectParams = [];
 
         if ($this->getRequest()->getParam('store')) {
             $storeIds[] = (int)$this->getRequest()->getParam('store');
             $redirectParams = ['store' => (int)$this->getRequest()->getParam('store')];
-        } else if ($this->getRequest()->getParam('website')) {
+        } elseif ($this->getRequest()->getParam('website')) {
             $website = $this->getStoreManager()->getWebsite((int)$this->getRequest()->getParam('website'));
             $storeIds = array_merge($storeIds, $website->GetStoreIds());
             $redirectParams = ['website' => (int)$this->getRequest()->getParam('website')];
-        } else $storeIds[] = 0;
+        } else {
+            $storeIds[] = 0;
+        }
 
         foreach ($storeIds as $storeId) {
-
             $store = $this->getStoreManager()->getStore($storeId);
 
             $merchantId = $this->_scopeConfig->getValue('payment/icepay_settings/merchant_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
@@ -131,15 +131,14 @@ class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
 
             $paymentmethodsDeleted = 0;
             foreach ($collection as $pmethod) {
-                if ($this->paymentmethodRepository->deleteById($pmethod['paymentmethod_id']))
+                if ($this->paymentmethodRepository->deleteById($pmethod['paymentmethod_id'])) {
                     $paymentmethodsDeleted++;
-
+                }
             }
             $this->messageManager->addSuccessMessage(__('A total of %1 record(s) were deleted from %2.', $paymentmethodsDeleted, $store->getName()));
 
             $paymentmethodsAdded = 0;
             foreach ($paymentMethods->PaymentMethods as $paymentMethodDescription) {
-
                 $paymentmethod = $this->paymentmethodDataFactory->create();
                 $paymentmethod->setCode($paymentMethodDescription->PaymentMethodCode);
                 $paymentmethod->setName($paymentMethodDescription->Description);
@@ -151,10 +150,10 @@ class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
                 $this->paymentmethodRepository->save($paymentmethod);
 
 
-                $arrCountry = array();
-                $arrCurrency = array();
-                $arrMinimum = array();
-                $arrMaximum = array();
+                $arrCountry = [];
+                $arrCurrency = [];
+                $arrMinimum = [];
+                $arrMaximum = [];
 
                 //TODO: repository, refactoring
                 foreach ($paymentMethodDescription->Issuers as $issuerDescription) {
@@ -179,12 +178,10 @@ class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
             }
 
             $this->messageManager->addSuccessMessage(__('A total of %1 record(s) were added to %2.', $paymentmethodsAdded, $store->getName()));
-
         }
 
         $resultRedirect = $this->resultRedirectFactory->create();
         return $resultRedirect->setPath('*/*/index/', $redirectParams);
-
     }
 
     protected function _isAllowed()

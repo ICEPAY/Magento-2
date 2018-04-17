@@ -65,7 +65,6 @@ class Edit extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
         $paymentmethod = $this->_paymentmethodFactory->create()->load($pmId);
 
         if ($paymentmethod && $paymentmethod->getId()) {
-
             $data = $this->_getSession()->getFormData(true);
             if (!empty($data)) {
                 $paymentmethod->setData($data);
@@ -88,5 +87,4 @@ class Edit extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
 
         return $resultRedirect;
     }
-
 }

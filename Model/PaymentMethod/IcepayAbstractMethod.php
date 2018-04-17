@@ -14,7 +14,6 @@ use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 
-
 class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 {
 
@@ -108,7 +107,6 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 
         $this->_moduleList = $moduleList;
         $this->_localeDate = $localeDate;
-
     }
 
 
@@ -118,10 +116,10 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 
         $pmethodFilter = $this->filterBuilder->setField('code')->setValue($this->icepayMethodCode)->setConditionType('eq')->create();
 
-        $storeFilters = array(
+        $storeFilters = [
             $this->filterBuilder->setField('store_id')->setValue((int)$store->getId())->setConditionType('eq')->create(),
             $this->filterBuilder->setField('store_id')->setValue(0)->setConditionType('eq')->create()
-        );
+        ];
 
         $this->searchCriteriaBuilder->addFilters([$pmethodFilter]);
         $this->searchCriteriaBuilder->addFilters($storeFilters);
@@ -130,11 +128,9 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
             $this->searchCriteriaBuilder->create()
         )->getItems());
 
-        if(1 == count($collection))
-        {
+        if (1 == count($collection)) {
             $this->paymentMethod = reset($collection);
-        }
-        else {
+        } else {
             foreach ($collection as $pmethod) {
                 if (0 != $pmethod->getStoreId()) {
                     $this->paymentMethod = $pmethod;
@@ -143,8 +139,7 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
             }
         }
 
-        if($this->paymentMethod)
-        {
+        if ($this->paymentMethod) {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             $mt = $objectManager->create('Icepay_Webservice_Paymentmethod');
             $pmData = $this->paymentMethod->getRawPmData();
@@ -166,9 +161,8 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
             return false;
         }
 
-        if ($quote)
-        {
-//            if ($this->paymentMethodInformation == null) {
+        if ($quote) {
+        //            if ($this->paymentMethodInformation == null) {
 //                $this->initPaymentMethodInformation();
 //            }
             $countryCode = $this->countryProvider->getCountry($quote);
@@ -179,15 +173,15 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
                 ->filterByAmount($quote->getBaseGrandTotal() * 100);
 
             $available = false;
-            foreach ($pMethod->getFilteredPaymentmethods() as $value)
-            {
-                if ($value->PaymentMethodCode === $this->icepayMethodCode)
-                {
+            foreach ($pMethod->getFilteredPaymentmethods() as $value) {
+                if ($value->PaymentMethodCode === $this->icepayMethodCode) {
                     $available = true;
                     break;
                 }
             }
-            if(!$available) return false;
+            if (!$available) {
+                return false;
+            }
         }
 
         return parent::isAvailable($quote);
@@ -196,8 +190,7 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected function getIssuerList($paymentMethodCode)
     {
-        if($this->paymentMethodInformation == null)
-        {
+        if ($this->paymentMethodInformation == null) {
             $this->initPaymentMethodInformation();
         }
 
@@ -227,8 +220,6 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
             $additionalData->getData('issuer')
         );
         return $this;
-
-
     }
 
     /**
@@ -319,25 +310,20 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
         );
 
         //TODO: refactor
-        if($icepayResult->status === "OPEN") {
+        if ($icepayResult->status === "OPEN") {
             $payment->setIsTransactionPending(true);
-        }
-        else if($icepayResult->status === "OK") {
+        } elseif ($icepayResult->status === "OK") {
             $payment->setIsTransactionApproved(true);
-        }
-        else
-        {
+        } else {
             $payment->setIsTransactionApproved(false);
             $payment->setIsTransactionPending(false); //TODO: Check if redundant
         }
-
     }
 
 
     public function getPaymentMethodDisplayName()
     {
-        if($this->paymentMethodInformation == null)
-        {
+        if ($this->paymentMethodInformation == null) {
             $this->initPaymentMethodInformation();
         }
         return $this->paymentMethod->getDisplayName();
@@ -374,6 +360,4 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
         }
         return $this->_storeManager;
     }
-
-
 }
