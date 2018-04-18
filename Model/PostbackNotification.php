@@ -11,7 +11,6 @@ namespace Icepay\IcpCore\Model;
 require_once(dirname(__FILE__) . '/restapi/src/Icepay/API/Autoloader.php');
 use Icepay\IcpCore\Api\PostbackNotificationInterface;
 use Magento\Store\Model\ScopeInterface;
-use Icepay\API\Icepay_StatusCode;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
