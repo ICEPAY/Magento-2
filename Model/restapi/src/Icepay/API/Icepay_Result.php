@@ -5,8 +5,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 class Icepay_Result extends Icepay_Api_Base
 {
@@ -14,7 +16,7 @@ class Icepay_Result extends Icepay_Api_Base
     public function __construct()
     {
         parent::__construct();
-        $this->data = new stdClass();
+        $this->data = new \stdClass();
     }
 
     /**
@@ -25,21 +27,21 @@ class Icepay_Result extends Icepay_Api_Base
      */
     public function validate()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+        if (filter_input(INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_STRING) != 'GET') {
             $this->_logger->log("Invalid request method", Icepay_Api_Logger::ERROR);
             return false;
         }
 
-        $this->_logger->log(sprintf("Page data: %s", serialize($_GET)), Icepay_Api_Logger::NOTICE);
+      //  $this->_logger->log(sprintf("Page data: %s", serialize($_GET)), Icepay_Api_Logger::NOTICE);
 
-        $this->data->status = (isset($_GET['Status'])) ? $_GET['Status'] : "";
-        $this->data->statusCode = (isset($_GET['StatusCode'])) ? $_GET['StatusCode'] : "";
-        $this->data->merchant = (isset($_GET['Merchant'])) ? $_GET['Merchant'] : "";
-        $this->data->orderID = (isset($_GET['OrderID'])) ? $_GET['OrderID'] : "";
-        $this->data->paymentID = (isset($_GET['PaymentID'])) ? $_GET['PaymentID'] : "";
-        $this->data->reference = (isset($_GET['Reference'])) ? $_GET['Reference'] : "";
-        $this->data->transactionID = (isset($_GET['TransactionID'])) ? $_GET['TransactionID'] : "";
-        $this->data->checksum = (isset($_GET['Checksum'])) ? $_GET['Checksum'] : "";
+        $this->data->status = (string)filter_input(INPUT_GET, 'Status');
+        $this->data->statusCode = (string)filter_input(INPUT_GET, 'StatusCode');
+        $this->data->merchant = (string)filter_input(INPUT_GET, 'Merchant');
+        $this->data->orderID = (string)filter_input(INPUT_GET, 'OrderID');
+        $this->data->paymentID = (string)filter_input(INPUT_GET, 'PaymentID');
+        $this->data->reference = (string)filter_input(INPUT_GET, 'Reference');
+        $this->data->transactionID = (string)filter_input(INPUT_GET, 'TransactionID');
+        $this->data->checksum = (string)filter_input(INPUT_GET, 'Checksum');
 
         if ($this->generateChecksumForPage() != $this->data->checksum) {
             $this->_logger->log("Checksum does not match", Icepay_Api_Logger::ERROR);

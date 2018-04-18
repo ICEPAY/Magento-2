@@ -5,8 +5,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 class Icepay_Webservice_Filtering
 {
@@ -77,12 +79,12 @@ class Icepay_Webservice_Filtering
             $fp = @fopen($filename, "r");
             $line = @fgets($fp);
             @fclose($fp);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
         };
 
         if (!$line) {
-            throw new Exception("No data stored");
+            throw new \Exception("No data stored");
         }
 
         $arr = explode(",", $line);

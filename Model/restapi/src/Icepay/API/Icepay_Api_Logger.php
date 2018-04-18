@@ -5,8 +5,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 class Icepay_Api_Logger
 {
@@ -228,10 +230,10 @@ class Icepay_Api_Logger
         $dateTime = date("H:i:s", time());
         $line = "{$dateTime} [ICEPAY]: {$line}" . PHP_EOL;
 
-        // Log to Screen
-        if ($this->_logToScreen) {
-            echo "{$line} <br />";
-        }
+//        // Log to Screen
+//        if ($this->_logToScreen) {
+//            echo "{$line} <br />";
+//        }
 
         // Log to Hooked Class
         if ($this->_logToHook && $this->_logHookClass && $this->_logHookFunc) {
@@ -248,8 +250,8 @@ class Icepay_Api_Logger
                 $fp = fopen($file, "a");
                 fwrite($fp, $line);
                 fclose($fp);
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage());
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage());
             };
         }
     }

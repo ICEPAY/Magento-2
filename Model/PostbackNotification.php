@@ -15,6 +15,7 @@ use Icepay_StatusCode;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
+use Icepay\API\Icepay_StatusCode;
 
 class PostbackNotification implements PostbackNotificationInterface
 {
@@ -96,7 +97,7 @@ class PostbackNotification implements PostbackNotificationInterface
         $this->objectManager = $objectManager;
         $this->logger = $logger;
 
-        $this->icepayPostback = $this->objectManager->create('Icepay_Postback');
+        $this->icepayPostback = $this->objectManager->create('Icepay\API\Icepay_Postback');
     }
 
 

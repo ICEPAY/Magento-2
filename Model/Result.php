@@ -74,7 +74,7 @@ class Result
         $this->objectManager = $objectManager;
         $this->logger = $logger;
 
-        $this->icepayResult = $this->objectManager->create('Icepay_Result');
+        $this->icepayResult = $this->objectManager->create('Icepay\API\Icepay_Result');
     }
 
     public function validate($store)
@@ -94,7 +94,7 @@ class Result
     public function isPaymentSuccessful()
     {
         $status = $this->icepayResult->getStatus();
-        if ($status === Icepay_StatusCode::SUCCESS || $status === Icepay_StatusCode::OPEN) {
+        if ($status === \Icepay\API\Icepay_StatusCode::SUCCESS || $status === \Icepay\API\Icepay_StatusCode::OPEN) {
             return true;
         }
 

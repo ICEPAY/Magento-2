@@ -4,8 +4,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 {
@@ -39,7 +41,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
     public function extendedCheckout(Icepay_PaymentObject_Interface_Abstract $paymentObj, $getUrlOnly = false)
     {
-        $obj = new stdClass();
+        $obj = new \stdClass();
 
         Icepay_Order::getInstance()->validateOrder($paymentObj);
 
@@ -73,7 +75,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         /* Verify response data */
         if ($checksum != $this->generateChecksum($result->CheckoutExtendedResult)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         /* Return mister checksum */
@@ -96,12 +98,12 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
     {
         // Check if PaymentMethod is allowed
         if (!array_key_exists($paymentObj->PaymentMethod, $this->autoCheckoutList)) {
-            throw new Exception("Error: Paymentmethod {$paymentObj->PaymentMethod} is not allowed to use autoCheckout");
+            throw new \Exception("Error: Paymentmethod {$paymentObj->PaymentMethod} is not allowed to use autoCheckout");
         }
 
         // Check if Issuer is allowed
         if (!in_array($paymentObj->Issuer, $this->autoCheckoutList[$paymentObj->PaymentMethod])) {
-            throw new Exception("Error: Issuer {$paymentObj->Issuer} is not allowed to use autoCheckout");
+            throw new \Exception("Error: Issuer {$paymentObj->Issuer} is not allowed to use autoCheckout");
         }
 
         return true;
@@ -109,7 +111,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
     public function autoCheckout(Icepay_PaymentObject_Interface_Abstract $paymentObj, $consumerID)
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         $obj->MerchantID = $this->getMerchantID();
         $obj->Timestamp = $this->getTimeStamp();
@@ -149,7 +151,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         /* Verify response data */
         if ($checksum != $this->generateChecksum($checksumObject, null, true)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         // Return checksum
@@ -160,7 +162,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
     public function vaultCheckout(Icepay_PaymentObject_Interface_Abstract $paymentObj, $consumerID, $getUrlOnly = false)
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         $obj->MerchantID = $this->getMerchantID();
         $obj->Timestamp = $this->getTimeStamp();
@@ -194,7 +196,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         /* Verify response data */
         if ($checksum != $this->generateChecksum($result->VaultCheckoutResult)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         /* Return mister checksum */
@@ -224,7 +226,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
      */
     public function checkOut(Icepay_PaymentObject_Interface_Abstract $paymentObj, $getUrlOnly = false)
     {
-        $obj = new stdClass();
+        $obj = new \stdClass();
 
         // Must be in specific order for checksum ---------
         $obj->MerchantID = $this->getMerchantID();
@@ -251,7 +253,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
             if (0 === strpos($result->Message, 'ERR_') || 0 === strpos($result->Message, 'IC_ERR')) {
                 $message .= ": " . preg_replace('/[^a-zA-Z0-9_\s]/', '', strip_tags($result->Message));
             }
-            throw new Exception($message);
+            throw new \Exception($message);
         }
 
         /* Return just the payment URL if required */
@@ -281,7 +283,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
      */
     public function phoneCheckout(Icepay_PaymentObject_Interface_Abstract $paymentObj, $getUrlOnly = false)
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         // Must be in specific order for checksum ---------
         $obj->MerchantID = $this->getMerchantID();
@@ -311,7 +313,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         /* Verify response data */
         if ($checksum != $this->generateChecksum($result->PhoneCheckoutResult)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         /* Return mister checksum */
@@ -339,7 +341,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
      */
     public function smsCheckout(Icepay_PaymentObject_Interface_Abstract $paymentObj, $getUrlOnly = false)
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         // Must be in specific order for checksum ---------
         $obj->MerchantID = $this->getMerchantID();
@@ -379,7 +381,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         /* Verify response data */
         if ($checksum != $this->generateChecksum($checksumObject)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         /* Return mister checksum */
@@ -406,7 +408,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
      */
     public function validatePhoneCode($paymentID, $phoneCode)
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         // Must be in specific order for checksum ---------
         $obj->MerchantID = $this->getMerchantID();
@@ -427,7 +429,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         /* Verify response data */
         if ($checksum != $this->generateChecksum($result)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         return $result->Success;
@@ -444,7 +446,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
      */
     public function validateSmsCode($paymentID, $smsCode)
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         // Must be in specific order for checksum ---------
         $obj->MerchantID = $this->getMerchantID();
@@ -465,7 +467,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         /* Verify response data */
         if ($checksum != $this->generateChecksum($result)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         return $result->Success;
@@ -482,7 +484,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
      */
     public function phoneDirectCheckout(Icepay_PaymentObject_Interface_Abstract $paymentObj)
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         // Must be in specific order for checksum ---------
         $obj->MerchantID = $this->getMerchantID();
@@ -523,7 +525,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         /* Verify response data */
         if ($checksum != $this->generateChecksum($result)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         /* Return mister checksum */
@@ -545,7 +547,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
      */
     public function getPremiumRateNumbers()
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         $obj->MerchantID = $this->getMerchantID();
         $obj->Timestamp = $this->getTimeStamp();
@@ -557,7 +559,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
         $premiumRateNumbers = isset($result->PremiumRateNumbers->PremiumRateNumberInformation) ? $result->PremiumRateNumbers->PremiumRateNumberInformation : null;
 
         // Checksum
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         $obj->SecretCode = $this->getSecretCode();
         $obj->MerchantID = $this->getMerchantID();
@@ -571,7 +573,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
 
         // Compare Checksums
         if ($result->Checksum != $Checksum) {
-            throw new Exception('Data could not be verified');
+            throw new \Exception('Data could not be verified');
         }
 
         return (array) $result;
@@ -590,7 +592,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
      */
     public function getPayment($paymentID)
     {
-        $obj = new StdClass();
+        $obj = new \stdClass();
 
         $obj->SecretCode = $this->getSecretCode();
         $obj->MerchantID = $this->getMerchantID();
@@ -629,7 +631,7 @@ class Icepay_Webservice_Pay extends Icepay_Webservice_Base
         ]);
 
         if ($checksum != $this->generateChecksum($signstring)) {
-            throw new Exception("Data could not be verified");
+            throw new \Exception("Data could not be verified");
         }
 
         /* Return mister checksum */

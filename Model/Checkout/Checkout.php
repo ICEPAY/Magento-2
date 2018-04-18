@@ -450,7 +450,7 @@ class Checkout
     protected function getIcepayApiPaymentObject()
     {
         if (null === $this->paymentObject) {
-            $this->paymentObject = $this->_objectManager->get('Icepay_PaymentObject');
+            $this->paymentObject = $this->_objectManager->get('Icepay\API\Icepay_PaymentObject');
         }
         return $this->paymentObject;
     }
@@ -461,7 +461,7 @@ class Checkout
     protected function getIcepayApiWebserviceObject()
     {
         if (null === $this->webserviceObject) {
-            $this->webserviceObject = $this->_objectManager->get('Icepay_Webservice_Pay');
+            $this->webserviceObject = $this->_objectManager->get('Icepay\API\Icepay_Webservice_Pay');
         }
         return $this->webserviceObject;
     }

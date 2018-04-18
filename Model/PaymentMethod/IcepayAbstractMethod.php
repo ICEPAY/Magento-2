@@ -141,7 +141,7 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 
         if ($this->paymentMethod) {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $mt = $objectManager->create('Icepay_Webservice_Paymentmethod');
+            $mt = $objectManager->create('Icepay\API\Icepay_Webservice_Paymentmethod');
             $pmData = $this->paymentMethod->getRawPmData();
             $method = $mt->loadFromArray(unserialize($pmData));
             $this->paymentMethodInformation = $method;

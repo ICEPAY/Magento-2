@@ -4,8 +4,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 class Icepay_Api_Base
 {
@@ -27,7 +29,7 @@ class Icepay_Api_Base
     public function __construct()
     {
         $this->_logger = Icepay_Api_Logger::getInstance();
-        $this->data = new stdClass();
+        $this->data = new \stdClass();
     }
 
     /**
@@ -67,7 +69,7 @@ class Icepay_Api_Base
     public function setMerchantID($merchantID)
     {
         if (!\Icepay\API\Icepay_Parameter_Validation::merchantID($merchantID)) {
-            throw new Exception('MerchantID not valid');
+            throw new \Exception('MerchantID not valid');
         }
 
         $this->_merchantID = (int) $merchantID;
@@ -95,7 +97,7 @@ class Icepay_Api_Base
     public function setSecretCode($secretCode)
     {
         if (!\Icepay\API\Icepay_Parameter_Validation::secretCode($secretCode)) {
-            throw new Exception('Secretcode not valid');
+            throw new \Exception('Secretcode not valid');
         }
 
         $this->_secretCode = (string) $secretCode;
@@ -122,7 +124,7 @@ class Icepay_Api_Base
     public function setPinCode($pinCode)
     {
         if (!\Icepay\API\Icepay_Parameter_Validation::pinCode($pinCode)) {
-            throw new Exception('Pincode not valid');
+            throw new \Exception('Pincode not valid');
         }
 
         $this->_pinCode = (string) $pinCode;
@@ -150,7 +152,7 @@ class Icepay_Api_Base
     public function setSuccessURL($url = "")
     {
         if (!isset($this->data)) {
-            $this->data = new stdClass();
+            $this->data = new \stdClass();
         }
 
         $this->data->ic_urlcompleted = $url;
@@ -167,7 +169,7 @@ class Icepay_Api_Base
     public function setErrorURL($url = "")
     {
         if (!isset($this->data)) {
-            $this->data = new stdClass();
+            $this->data = new \stdClass();
         }
 
         $this->data->ic_urlerror = $url;

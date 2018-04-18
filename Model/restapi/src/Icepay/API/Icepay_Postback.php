@@ -5,8 +5,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 class Icepay_Postback extends Icepay_Api_Base
 {
@@ -14,7 +16,7 @@ class Icepay_Postback extends Icepay_Api_Base
     public function __construct()
     {
         parent::__construct();
-        $this->data = new stdClass();
+        $this->data = new \stdClass();
     }
 
     /**
@@ -173,11 +175,11 @@ class Icepay_Postback extends Icepay_Api_Base
             return false;
         };
         
-        $this->_logger->log(sprintf("Postback: %s", serialize($_POST)), Icepay_Api_Logger::TRANSACTION);
+        //$this->_logger->log(sprintf("Postback: %s", serialize($_POST)), Icepay_Api_Logger::TRANSACTION);
 
         /* @since version 1.0.2 */
         foreach ($this->getPostbackResponseFields() as $obj => $param) {
-            $this->data->$obj = (isset($_POST[$param])) ? $_POST[$param] : "";
+            $this->data->$obj = (string)filter_input(INPUT_POST, $param);
         }
 
         if ($this->isVersionCheck()) {

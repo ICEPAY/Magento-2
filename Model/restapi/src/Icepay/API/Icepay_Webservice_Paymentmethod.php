@@ -5,8 +5,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
 {
@@ -27,7 +29,7 @@ class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
     public function selectPaymentMethodByCode($name)
     {
         if (!isset($this->_paymentMethodsArray)) {
-            throw new Exception("No data loaded");
+            throw new \Exception("No data loaded");
         }
         foreach ($this->_paymentMethodsArray as $paymentMethod) {
             if ($paymentMethod->PaymentMethodCode == strtoupper($name)) {
@@ -50,7 +52,7 @@ class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
     public function selectIssuerByKeyword($name)
     {
         if (!isset($this->_paymentMethodsArray)) {
-            throw new Exception("No data loaded");
+            throw new \Exception("No data loaded");
         }
         foreach ($this->_paymentMethodsArray as $paymentMethod) {
             foreach ($paymentMethod->Issuers as $issuer) {
@@ -126,7 +128,7 @@ class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
     public function getIssuers()
     {
         if (!isset($this->_methodData)) {
-            throw new Exception("Paymentmethod must be selected first");
+            throw new \Exception("Paymentmethod must be selected first");
         }
         return $this->_methodData->Issuers;
     }
@@ -142,10 +144,10 @@ class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
     public function getCurrencies()
     {
         if (!isset($this->_issuerData)) {
-            throw new Exception("Issuer must be selected first");
+            throw new \Exception("Issuer must be selected first");
         }
         if (!isset($this->_country)) {
-            throw new Exception("Country must be selected first");
+            throw new \Exception("Country must be selected first");
         }
         foreach ($this->_issuerData["Countries"] as $country) {
             if ($this->_country == $country["CountryCode"]) {
@@ -166,7 +168,7 @@ class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
     public function getCountries()
     {
         if (!isset($this->_issuerData)) {
-            throw new Exception("Issuer must be selected first");
+            throw new \Exception("Issuer must be selected first");
         }
         $countries = [];
         foreach ($this->_issuerData["Countries"] as $country) {
@@ -186,10 +188,10 @@ class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
     public function getMinimumAmount()
     {
         if (!isset($this->_issuerData)) {
-            throw new Exception("Issuer must be selected first");
+            throw new \Exception("Issuer must be selected first");
         }
         if (!isset($this->_country)) {
-            throw new Exception("Country must be selected first");
+            throw new \Exception("Country must be selected first");
         }
         foreach ($this->_issuerData["Countries"] as $country) {
             if ($this->_country == $country["CountryCode"]) {
@@ -209,10 +211,10 @@ class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
     public function getMaximumAmount()
     {
         if (!isset($this->_issuerData)) {
-            throw new Exception("Issuer must be selected first");
+            throw new \Exception("Issuer must be selected first");
         }
         if (!isset($this->_country)) {
-            throw new Exception("Country must be selected first");
+            throw new \Exception("Country must be selected first");
         }
         foreach ($this->_issuerData["Countries"] as $country) {
             if ($this->_country == $country["CountryCode"]) {
@@ -233,7 +235,7 @@ class Icepay_Webservice_Paymentmethod extends Icepay_Webservice_Filtering
     protected function validateCountry($country)
     {
         if (strlen($country) != 2) {
-            throw new Exception("Country must be ISO 3166-1 alpha-2");
+            throw new \Exception("Country must be ISO 3166-1 alpha-2");
         }
         return strtoupper($country);
     }

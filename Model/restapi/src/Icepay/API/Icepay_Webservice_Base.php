@@ -5,9 +5,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
 
+namespace Icepay\API;
 
 class Icepay_Webservice_Base extends Icepay_Api_Base
 {
@@ -30,7 +31,7 @@ class Icepay_Webservice_Base extends Icepay_Api_Base
         }
 
         /* Start a new client */
-        $this->client = new Icepay\API\Client();
+        $this->client = new \Icepay\API\Client();
         $this->client->setApiSecret($this->_secretCode);
         $this->client->setApiKey($this->_merchantID);
         $this->client->setCompletedURL($this->data->ic_urlcompleted);
@@ -76,13 +77,13 @@ class Icepay_Webservice_Base extends Icepay_Api_Base
     {
 
         if (!is_object($object)) {
-            throw new Exception("Please provide a valid Object for the arrangeObject method");
+            throw new \Exception("Please provide a valid Object for the arrangeObject method");
         }
         if (!is_array($order) || empty($order)) {
-            throw new Exception("Please provide a valid orderArray for the arrangeObject method");
+            throw new \Exception("Please provide a valid orderArray for the arrangeObject method");
         }
 
-        $obj = new stdClass();
+        $obj = new \stdClass();
 
         foreach ($order as $key) {
             $obj->$key = $object->$key;
@@ -105,7 +106,7 @@ class Icepay_Webservice_Base extends Icepay_Api_Base
     {
 
         if (!is_object($mainObject)) {
-            throw new Exception("Please provide a valid Object");
+            throw new \Exception("Please provide a valid Object");
         }
 
         $mainObject = $mainObject;

@@ -5,8 +5,10 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 class Icepay_PaymentObject implements Icepay_PaymentObject_Interface_Abstract
 {
@@ -24,7 +26,7 @@ class Icepay_PaymentObject implements Icepay_PaymentObject_Interface_Abstract
     public function __construct()
     {
         // Instantiate $this->data explicitely for PHP Strict error reporting
-        $this->data = new stdClass();
+        $this->data = new \stdClass();
     }
 
     public static function getInstance()
@@ -101,7 +103,7 @@ class Icepay_PaymentObject implements Icepay_PaymentObject_Interface_Abstract
     {
         $country = strtoupper($country);
         if (!\Icepay\API\Icepay_Parameter_Validation::country($country)) {
-            throw new Exception('Country not valid');
+            throw new \Exception('Country not valid');
         }
         $this->data->ic_country = $country;
         return $this;
@@ -130,7 +132,7 @@ class Icepay_PaymentObject implements Icepay_PaymentObject_Interface_Abstract
     public function setLanguage($lang)
     {
         if (!\Icepay\API\Icepay_Parameter_Validation::language($lang)) {
-            throw new Exception('Language not valid');
+            throw new \Exception('Language not valid');
         }
         $this->data->ic_language = $lang;
         return $this;
@@ -147,7 +149,7 @@ class Icepay_PaymentObject implements Icepay_PaymentObject_Interface_Abstract
         $amount = (int) (string) $amount;
 
         if (!\Icepay\API\Icepay_Parameter_Validation::amount($amount)) {
-            throw new Exception('Amount not valid');
+            throw new \Exception('Amount not valid');
         }
         $this->data->ic_amount = $amount;
         return $this;
