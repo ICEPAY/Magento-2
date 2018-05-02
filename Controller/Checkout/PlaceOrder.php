@@ -9,6 +9,7 @@ namespace Icepay\IcpCore\Controller\Checkout;
 
 use Magento\TestFramework\Inspection\Exception;
 use Magento\Checkout\Model\Type\Onepage;
+use Magento\Framework\Controller\ResultFactory;
 
 /**
  * Class PlaceOrder
@@ -32,6 +33,7 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
     public function execute()
     {
         $errorMessage = 'unknown error';
+        $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
 
         try {
             $this->initCheckout();
@@ -66,8 +68,7 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
             );
             $url = $this->checkout->getRedirectUrl();
             if ($success && $url) {
-                $this->getResponse()->setRedirect($url);
-                return;
+                return $resultRedirect->setPath($url, ['_secure' => true]);
             }
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $errorMessage = $e->getMessage();
@@ -93,6 +94,7 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
             $this->getCheckoutSession()->restoreQuote();
         }
 
-        $this->_redirect('checkout/cart');
+        return $resultRedirect->setPath('checkout/cart', ['_secure' => true]);
+
     }
 }
