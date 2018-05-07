@@ -14,7 +14,7 @@ use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 
-class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
+abstract class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 {
 
     /**
@@ -188,14 +188,42 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
 
-    protected function getIssuerList($paymentMethodCode)
+    public function getIssuerList($paymentMethodCode = null)
     {
         if ($this->paymentMethodInformation == null) {
             $this->initPaymentMethodInformation();
         }
 
+        if(is_null($paymentMethodCode))
+        {
+            $paymentMethodCode = static::PMCODE;
+        }
+
         $pMethod = $this->paymentMethodInformation->selectPaymentMethodByCode($paymentMethodCode);
-        return $pMethod->getIssuers();
+        $list = $pMethod->getIssuers();
+
+        $arr = [];
+        foreach ($list as $issuer) {
+            array_push($arr, [
+                'name' => $issuer->Description,
+                'code' => $issuer->IssuerKeyword,
+            ]);
+        }
+
+        return $arr;
+
+    }
+    
+    /**
+     * Checkout redirect URL getter for onepage checkout
+     *
+     * @see \Magento\Checkout\Controller\Onepage::savePaymentAction()
+     * @see Quote\Payment::getCheckoutRedirectUrl()
+     * @return string
+     */
+    public function getCheckoutRedirectUrl()
+    {
+        return $this->_urlBuilder->getUrl('icepay/checkout/placeorder');
     }
 
 
@@ -257,13 +285,7 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-//        $icepayTransactionData = $this->_checkoutSession->getIcepayTransactionData();
-//        if (!isset($icepayTransactionData)) {
-//            throw new LocalizedException(__('ICEPAY result is not set. Order is canceled or already created.'));
-//        } else {
-//            $this->_importToPayment($icepayTransactionData, $payment);
-//        }
-        
+
         $order = $payment->getOrder();
         //$orderTransactionId = $payment->getTransactionId().'-order';
 
@@ -290,34 +312,6 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
         $payment->setSkipOrderProcessing(true);
 
         return $this;
-    }
-
-
-    /**
-     * Import payment info to payment
-     *
-     * @param Icepay_Result $icepayResult
-     * @param Payment $payment
-     * @return void
-     */
-    protected function _importToPayment($icepayResult, $payment)
-    {
-        
-        $payment->setTransactionId(
-            $icepayResult->transactionID
-        )->setIsTransactionClosed(
-            0
-        );
-
-        //TODO: refactor
-        if ($icepayResult->status === "OPEN") {
-            $payment->setIsTransactionPending(true);
-        } elseif ($icepayResult->status === "OK") {
-            $payment->setIsTransactionApproved(true);
-        } else {
-            $payment->setIsTransactionApproved(false);
-            $payment->setIsTransactionPending(false); //TODO: Check if redundant
-        }
     }
 
 

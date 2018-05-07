@@ -187,33 +187,5 @@ class GiroPay extends IcepayAbstractMethod
         $this->transactionRepository = $transactionRepository;
         $this->issuerFactory = $issuerFactory;
     }
-
-
-    public function getIssuerList($paymentMethodCode = null)
-    {
-        $list = parent::getIssuerList(GiroPay::PMCODE);
-
-        $arr = [];
-        foreach ($list as $issuer) {
-            array_push($arr, [
-                'name' => $issuer->Description,
-                'code' => $issuer->IssuerKeyword,
-            ]);
-        }
-
-        return $arr;
-    }
-
-
-    /**
-     * Checkout redirect URL getter for onepage checkout (hardcode)
-     *
-     * @see \Magento\Checkout\Controller\Onepage::savePaymentAction()
-     * @see Quote\Payment::getCheckoutRedirectUrl()
-     * @return string
-     */
-    public function getCheckoutRedirectUrl()
-    {
-        return $this->_urlBuilder->getUrl('icepay/checkout/placeorder');
-    }
+    
 }
