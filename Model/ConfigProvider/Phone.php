@@ -19,7 +19,8 @@ class Phone extends AbstractConfigProvider
      */
     public function getConfig()
     {
-        return $this->method->isAvailable() ? [
+        $quote = $this->checkoutSession->getQuote();
+        return $this->method->isAvailable($quote) ? [
             'payment' => [
                 'icepay' => [
                     'phone' => [
