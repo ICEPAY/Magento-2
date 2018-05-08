@@ -151,6 +151,7 @@ abstract class IcepayAbstractMethod extends \Magento\Payment\Model\Method\Abstra
 
     /**
      * Determine method availability based on quote amount, country and currency
+     * TODO: use specifications
      *
      * @param \Magento\Quote\Api\Data\CartInterface|null $quote
      * @return bool
@@ -188,26 +189,34 @@ abstract class IcepayAbstractMethod extends \Magento\Payment\Model\Method\Abstra
     }
 
 
-    public function getIssuerList($paymentMethodCode = null)
+    public function getIssuerList(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         if ($this->paymentMethodInformation == null) {
             $this->initPaymentMethodInformation();
         }
 
-        if(is_null($paymentMethodCode))
-        {
-            $paymentMethodCode = static::PMCODE;
+        $paymentMethodCode = static::PMCODE;
+
+        if (is_null($quote)) {
+            $countryCode = null;
+        } else {
+            $countryCode = $this->countryProvider->getCountry($quote);
         }
 
         $pMethod = $this->paymentMethodInformation->selectPaymentMethodByCode($paymentMethodCode);
         $list = $pMethod->getIssuers();
 
+
         $arr = [];
         foreach ($list as $issuer) {
-            array_push($arr, [
-                'name' => $issuer->Description,
-                'code' => $issuer->IssuerKeyword,
-            ]);
+            foreach ($issuer->Countries as $country) {
+                if ( is_null($countryCode) || strtoupper($country->CountryCode) == strtoupper($countryCode) || $country->CountryCode == "00") {
+                    array_push($arr, [
+                        'name' => $issuer->Description,
+                        'code' => $issuer->IssuerKeyword,
+                    ]);
+                }
+            }
         }
 
         return $arr;
