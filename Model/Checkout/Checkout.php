@@ -485,19 +485,31 @@ class Checkout
             $this->prepareGuestQuote();
         }
 
+        if ($this->getCheckoutMethod() == \Magento\Checkout\Model\Type\Onepage::METHOD_CUSTOMER) {
+            $billingAddress = $this->quote->getBillingAddress();
+            //TODO: improve
+            if (is_null($billingAddress->getCustomerName()) && is_null($billingAddress->getCustomerAddress())) {
+
+                $currentCustomer = $this->getCustomer();
+                if (!$currentCustomer->getDefaultBilling() && $currentCustomer->getDefaultShipping()) {
+                    //set billing address same as shipping
+                    $shippingAddressData = $this->_accountManagement->getDefaultShippingAddress($currentCustomer->getId());
+                    $this->quote->getBillingAddress()->importCustomerAddressData(
+                        $shippingAddressData
+                    );
+                }
+
+            }
+        }
+
         $this->quote->collectTotals();
         $orderId = $this->cartManagement->placeOrder($this->quote->getId());
-//        $order = $this->cartManagement->submit($this->quote);
 
         if (!$orderId) {
             return;
         }
-
-//        $this->_order = $order;
         $this->_order = $this->_orderFactory->create()->load($orderId);
     }
-
-
 
     /**
      * Return order
@@ -539,6 +551,15 @@ class Checkout
         return $this->_customerSession;
     }
 
+    /**
+     * Get current customer object
+     *
+     * @return \Magento\Customer\Api\Data\CustomerInterface
+     */
+    public function getCustomer()
+    {
+        return $this->_customerSession->getCustomerDataObject();
+    }
 
     /**
      * Prepare quote for guest checkout order submit
