@@ -83,15 +83,16 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
 
         if (isset($this->checkout)) {
             // if there is an order - cancel it
-            $orderId = $this->getCheckoutSession()->getLastOrderId();
             /** @var \Magento\Sales\Model\Order $order */
-            $order = $orderId ? $this->_orderFactory->create()->load($orderId) : false;
-            
-            $this->cancelOrder($this->checkout->getOrder(), 'Order was cancelled due to a system error: ' . $errorMessage);
-            $this->messageManager->addErrorMessage(
-                __('Order was cancelled due to a system error.')
-            );
-            $this->getCheckoutSession()->restoreQuote();
+            $order = $this->checkout ?  $this->checkout->getOrder() : false;//$this->getCheckoutSession()->getLastOrderId();
+
+            if($order) {
+                $this->cancelOrder($order, 'Order was cancelled due to a system error: ' . $errorMessage);
+                $this->messageManager->addErrorMessage(
+                    __('Order was cancelled due to a system error.')
+                );
+                $this->getCheckoutSession()->restoreQuote();
+            }
         }
 
         return $resultRedirect->setPath('checkout/cart', ['_secure' => true]);
