@@ -491,14 +491,15 @@ class Checkout
             if (is_null($billingAddress->getCustomerName()) && is_null($billingAddress->getCustomerAddress())) {
 
                 $currentCustomer = $this->getCustomer();
-                if (!$currentCustomer->getDefaultBilling() && $currentCustomer->getDefaultShipping()) {
+                $defaultShippingAddressId = $currentCustomer->getDefaultShipping();
+                $defaultBillingAddressId = $currentCustomer->getDefaultBilling();
+
+                if ($defaultShippingAddressId &&
+                    (!$defaultBillingAddressId || ($defaultBillingAddressId === $defaultShippingAddressId))) {
                     //set billing address same as shipping
                     $shippingAddressData = $this->_accountManagement->getDefaultShippingAddress($currentCustomer->getId());
-                    $this->quote->getBillingAddress()->importCustomerAddressData(
-                        $shippingAddressData
-                    );
+                    $this->quote->getBillingAddress()->importCustomerAddressData($shippingAddressData);
                 }
-
             }
         }
 
