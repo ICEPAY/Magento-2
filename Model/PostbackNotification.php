@@ -21,7 +21,7 @@ class PostbackNotification implements PostbackNotificationInterface
 
 
     /**
-     * @var Icepay_Postback
+     * @var \Icepay\API\Icepay_Postback
      */
     protected $icepayPostback;
 
@@ -68,6 +68,11 @@ class PostbackNotification implements PostbackNotificationInterface
     protected $logger;
 
     /**
+     * @var \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+     */
+    protected $transactionBuilder;
+
+    /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \Magento\Sales\Model\Order $order
@@ -75,6 +80,7 @@ class PostbackNotification implements PostbackNotificationInterface
      * @param \Magento\Framework\Webapi\Request $request
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param LoggerInterface $logger
+     * @param \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -84,7 +90,8 @@ class PostbackNotification implements PostbackNotificationInterface
         InvoiceSender $invoiceSender,
         \Magento\Framework\Webapi\Request $request,
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
     ) {
     
         $this->scopeConfig = $scopeConfig;
@@ -95,6 +102,7 @@ class PostbackNotification implements PostbackNotificationInterface
         $this->request = $request;
         $this->objectManager = $objectManager;
         $this->logger = $logger;
+        $this->transactionBuilder = $transactionBuilder;
 
         $this->icepayPostback = $this->objectManager->create('Icepay\API\Icepay_Postback');
     }
@@ -138,8 +146,9 @@ class PostbackNotification implements PostbackNotificationInterface
             }
 
             $this->order->loadByIncrementId($this->icepayPostback->getOrderID());
-
+            $transactionId = (string)filter_input(INPUT_POST, 'TransactionID');
             $currentIcepayOrderStatus = $this->getIcepayOrderStatus($this->order->getStatus());
+            $amount = (string)filter_input(INPUT_POST, 'Amount');   //$this->icepayPostback->getPostbackResponseFields()
 
             if (($currentIcepayOrderStatus === "NEW" || $this->icepayPostback->canUpdateStatus($currentIcepayOrderStatus)) && $this->icepayPostback->getStatus() !== $currentIcepayOrderStatus) {
                 switch ($this->icepayPostback->getStatus()) {
@@ -148,6 +157,8 @@ class PostbackNotification implements PostbackNotificationInterface
                         $this->order->setStatus('icepay_icpcore_open');
                         $this->orderSender->send($this->order);
                         $this->order->save();
+
+                        $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
 
                         $history = $this->order->addStatusHistoryComment(__(
                             'Transaction status has changed to OPEN.'
@@ -159,6 +170,8 @@ class PostbackNotification implements PostbackNotificationInterface
                         $this->order->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
                         $this->order->setStatus('icepay_icpcore_ok');
                         $this->order->save();
+
+                        $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
 
                         $history = $this->order->addStatusHistoryComment(__(
                             'Order has been paid successfully.'
@@ -176,6 +189,8 @@ class PostbackNotification implements PostbackNotificationInterface
                         }
                         $this->orderSender->send($this->order);
                         $this->order->save();
+
+                        $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
 
                         $history = $this->order->addStatusHistoryComment(__(
                             'Order was cancelled due to a system error.'
@@ -197,14 +212,13 @@ class PostbackNotification implements PostbackNotificationInterface
             }
 
             if ($this->order->getState() == \Magento\Sales\Model\Order::STATE_PROCESSING && $this->order->canInvoice() && !$this->order->hasInvoices()) {
-
-                /**
-                 * @var \Magento\Sales\Model\Order\Payment $payment
-                 */
-                $payment = $this->order->getPayment();
-                $payment->registerCaptureNotification($this->order->getGrandTotal());
-                $payment->save();
-                $this->order->save();
+//                /**
+//                 * @var \Magento\Sales\Model\Order\Payment $payment
+//                 */
+//                $payment = $this->order->getPayment();
+//                $payment->registerCaptureNotification($this->order->getGrandTotal());
+//                $payment->save();
+//                $this->order->save();
 
                 foreach ($this->order->getInvoiceCollection() as $invoice) {
                     $this->invoiceSender->send($invoice, true);
@@ -226,6 +240,47 @@ class PostbackNotification implements PostbackNotificationInterface
                 0,
                 \Magento\Framework\Webapi\Exception::HTTP_INTERNAL_ERROR
             );
+        }
+    }
+
+    private function createTransaction($order, $transactionId, $paymentAmount, $paymentData)
+    {
+        try {
+            //get payment object from order object
+            $payment = $order->getPayment();
+            $payment->setLastTransId($transactionId);
+            $payment->setTransactionId($transactionId);
+            $payment->setAdditionalInformation(
+                [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS =>  $paymentData]
+            );
+            $formatedPrice = $order->getBaseCurrency()->formatTxt(
+                $order->getGrandTotal()
+            );
+
+            $message = __('Payment amount is %1.', $formatedPrice);
+            //get the object of builder class
+            $trans = $this->transactionBuilder;
+            $transaction = $trans->setPayment($payment)
+                ->setOrder($order)
+                ->setTransactionId($transactionId)
+                ->setAdditionalInformation(
+                    [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS =>  $paymentData]
+                )
+                ->setFailSafe(true)
+                //build method creates the transaction and returns the object
+                ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_PAYMENT);
+
+            $payment->addTransactionCommentsToOrder(
+                $transaction,
+                $message
+            );
+            $payment->setParentTransactionId(null);
+            $payment->save();
+            $order->save();
+
+            return  $transaction->save()->getTransactionId();
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
         }
     }
 
@@ -257,7 +312,7 @@ class PostbackNotification implements PostbackNotificationInterface
                 return Icepay_StatusCode::ERROR;
             default:
                 throw new \Magento\Framework\Webapi\Exception(
-                    __(sprintf('No mapping found for status: ', $magentoOrderStatus)),
+                    __(sprintf('No mapping found for status: %s', $magentoOrderStatus)),
                     0,
                     \Magento\Framework\Webapi\Exception::HTTP_NOT_FOUND
                 );
