@@ -1,8 +1,10 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+ 
 namespace Icepay\IcpCore\Ui\Component\Listing\Column;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -57,7 +59,7 @@ class PaymentmethodActions extends Column
                     'hidden' => false,
                 ];
 
-                if($item['is_active']) {
+                if ($item['is_active']) {
                     $item[$this->getData('name')]['disable'] = [
                         'href' => $this->urlBuilder->getUrl(
                             'icepay_icpcore/paymentmethod/toggle',
@@ -66,9 +68,7 @@ class PaymentmethodActions extends Column
                         'label' => __('Disable'),
                         'hidden' => false,
                     ];
-                }
-                else
-                {
+                } else {
                     $item[$this->getData('name')]['enable'] = [
                         'href' => $this->urlBuilder->getUrl(
                             'icepay_icpcore/paymentmethod/toggle',

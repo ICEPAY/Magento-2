@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+
 namespace Icepay\IcpCore\Controller\Adminhtml\Paymentmethod;
 
 class Toggle extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
@@ -20,8 +26,8 @@ class Toggle extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory,
         \Icepay\IcpCore\Model\PaymentmethodFactory $paymentmethodFactory
-    )
-    {
+    ) {
+    
         $this->paymentmethodFactory = $paymentmethodFactory;
         parent::__construct($context, $resultPageFactory, $resultForwardFactory);
     }
@@ -39,12 +45,10 @@ class Toggle extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
 
         if ($paymentmethod && $paymentmethod->getId()) {
             try {
-
                 $paymentmethod->setIsActive(!$paymentmethod->getIsActive());
                 $paymentmethod->save();
                 $this->messageManager->addSuccess(__('Payment method successfully saved.'));
-
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->messageManager->addError(__('Error with editing payment method action.'));
             }
         }
@@ -61,6 +65,4 @@ class Toggle extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
     {
         return $this->_authorization->isAllowed('Icepay_IcpCore::paymentmethod_save');
     }
-
-
 }

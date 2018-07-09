@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+-->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="checkout.root">
@@ -23,7 +30,7 @@
                                                                     <item name="component" xsi:type="string">Icepay_IcpCore/js/view/payment/icepay-payments</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="icepay_icpcore_creditcard" xsi:type="array">
-                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">false</item>
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                         <item name="icepay_icpcore_directdebit" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>

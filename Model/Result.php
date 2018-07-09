@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+ 
 namespace Icepay\IcpCore\Model;
 
 //TODO: replace
@@ -8,8 +14,7 @@ use Icepay_StatusCode;
 use Psr\Log\LoggerInterface;
 use Magento\Store\Model\ScopeInterface;
 
-
-class Result    
+class Result
 {
 
     /**
@@ -52,14 +57,14 @@ class Result
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-//        \Magento\Sales\Model\Order $order,
-//        OrderSender $orderSender,
-//        InvoiceSender $invoiceSender,
-//        \Magento\Framework\Webapi\Request $request,
+        //        \Magento\Sales\Model\Order $order,
+        //        OrderSender $orderSender,
+        //        InvoiceSender $invoiceSender,
+        //        \Magento\Framework\Webapi\Request $request,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         LoggerInterface $logger
-    )
-    {
+    ) {
+    
         $this->scopeConfig = $scopeConfig;
         $this->encryptor = $encryptor;
 //        $this->order = $order;
@@ -69,8 +74,7 @@ class Result
         $this->objectManager = $objectManager;
         $this->logger = $logger;
 
-        $this->icepayResult = $this->objectManager->create('Icepay_Result');
-
+        $this->icepayResult = $this->objectManager->create('Icepay\API\Icepay_Result');
     }
 
     public function validate($store)
@@ -90,11 +94,10 @@ class Result
     public function isPaymentSuccessful()
     {
         $status = $this->icepayResult->getStatus();
-        if ($status === Icepay_StatusCode::SUCCESS || $status === Icepay_StatusCode::OPEN)
+        if ($status === \Icepay\API\Icepay_StatusCode::SUCCESS || $status === \Icepay\API\Icepay_StatusCode::OPEN) {
             return true;
+        }
 
         return false;
-
     }
-
 }

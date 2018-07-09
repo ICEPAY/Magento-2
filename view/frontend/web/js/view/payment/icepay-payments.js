@@ -1,3 +1,9 @@
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+
 /*browser:true*/
 /*global define*/
 define(
@@ -55,7 +61,6 @@ define(
                 type: 'icepay_icpcore_wiretransfer',
                 component: 'Icepay_IcpCore/js/view/payment/method-renderer/wiretransfer'
             }
-
         );
         /** Add view logic here if needed */
         return Component.extend({});

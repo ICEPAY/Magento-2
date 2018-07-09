@@ -5,10 +5,13 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_Webservice_Filtering {
+namespace Icepay\API;
+
+class Icepay_Webservice_Filtering
+{
 
     protected $_paymentMethodsArray;
     protected $_paymentMethodsArrayFiltered;
@@ -67,20 +70,21 @@
      */
     public function loadFromFile($fileName = "wsdata", $directory = "")
     {
-        if ($directory == "")
+        if ($directory == "") {
             $directory = dirname(__FILE__);
+        }
 
         $filename = sprintf("%s/%s.csv", $directory, $fileName);
         try {
             $fp = @fopen($filename, "r");
             $line = @fgets($fp);
             @fclose($fp);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
         };
 
         if (!$line) {
-            throw new Exception("No data stored");
+            throw new \Exception("No data stored");
         }
 
         $arr = explode(",", $line);
@@ -121,7 +125,7 @@
      */
     public function filterByCurrency($currency)
     {
-        $filteredArr = array();
+        $filteredArr = [];
        // var_dump($this->_paymentMethodsArrayFiltered);
         foreach ($this->_paymentMethodsArrayFiltered as $paymentMethod) {
             $continue = true;
@@ -131,11 +135,13 @@
                         array_push($filteredArr, $paymentMethod); //return//return
                         $continue = false;
                     }
-                    if (!$continue)
+                    if (!$continue) {
                         break;
+                    }
                 }
-                if (!$continue)
+                if (!$continue) {
                     break;
+                }
             }
         }
         $this->_paymentMethodsArrayFiltered = $filteredArr;
@@ -150,7 +156,7 @@
      */
     public function filterByCountry($countryCode)
     {
-        $filteredArr = array();
+        $filteredArr = [];
         foreach ($this->_paymentMethodsArrayFiltered as $paymentMethod) {
             $continue = true;
             foreach ($paymentMethod->Issuers as $issuer) {
@@ -159,11 +165,13 @@
                         array_push($filteredArr, $paymentMethod);
                         $continue = false;
                     }
-                    if (!$continue)
+                    if (!$continue) {
                         break;
+                    }
                 }
-                if (!$continue)
+                if (!$continue) {
                     break;
+                }
             }
         }
         $this->_paymentMethodsArrayFiltered = $filteredArr;
@@ -179,7 +187,7 @@
     public function filterByAmount($amount)
     {
         $amount = intval($amount);
-        $filteredArr = array();
+        $filteredArr = [];
         foreach ($this->_paymentMethodsArrayFiltered as $paymentMethod) {
             $continue = true;
             foreach ($paymentMethod->Issuers as $issuer) {
@@ -189,15 +197,16 @@
                         array_push($filteredArr, $paymentMethod);
                         $continue = false;
                     }
-                    if (!$continue)
+                    if (!$continue) {
                         break;
+                    }
                 }
-                if (!$continue)
+                if (!$continue) {
                     break;
+                }
             }
         }
         $this->_paymentMethodsArrayFiltered = $filteredArr;
         return $this;
     }
-
 }

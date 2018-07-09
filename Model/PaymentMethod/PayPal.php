@@ -1,10 +1,11 @@
 <?php
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+ 
 namespace Icepay\IcpCore\Model\PaymentMethod;
-
 
 use Icepay\IcpCore\Model\Icepay;
 use Icepay\IcpCore\Model\Issuer;
@@ -197,114 +198,7 @@ class PayPal extends IcepayAbstractMethod
         $this->_checkoutSession = $checkoutSession;
         $this->_exception = $exception;
         $this->transactionRepository = $transactionRepository;
-        $this->issuerFactory = $issuerFactory;
-//        $this->transactionBuilder = $transactionBuilder;
-
-    }
-
-
-    /**
-     * Payment capturing
-     *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param float $amount
-     * @return $this
-     * @throws \Magento\Framework\Validator\Exception
-     */
-    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
-        //throw new \Magento\Framework\Validator\Exception(__('Inside Stripe, throwing donuts :]'));
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $payment->getOrder();
-        /** @var \Magento\Sales\Model\Order\Address $billing */
-        $billing = $order->getBillingAddress();
-        try {
-//            $requestData = [
-//                'amount'        => $amount * 100,
-//                'currency'      => strtolower($order->getBaseCurrencyCode()),
-//                'description'   => sprintf('#%s, %s', $order->getIncrementId(), $order->getCustomerEmail()),
-//                'card'          => [
-//                    'number'            => $payment->getCcNumber(),
-//                    'exp_month'         => sprintf('%02d',$payment->getCcExpMonth()),
-//                    'exp_year'          => $payment->getCcExpYear(),
-//                    'cvc'               => $payment->getCcCid(),
-//                    'name'              => $billing->getName(),
-//                    'address_line1'     => $billing->getStreetLine(1),
-//                    'address_line2'     => $billing->getStreetLine(2),
-//                    'address_city'      => $billing->getCity(),
-//                    'address_zip'       => $billing->getPostcode(),
-//                    'address_state'     => $billing->getRegion(),
-//                    'address_country'   => $billing->getCountryId(),
-//                    // To get full localized country name, use this instead:
-//                    // 'address_country'   => $this->_countryFactory->create()->loadByCode($billing->getCountryId())->getName(),
-//                ]
-//            ];
-//            $charge = \Stripe\Charge::create($requestData);
-//            $payment
-//                ->setTransactionId($charge->id)
-//                ->setIsTransactionClosed(0);
-        } catch (\Exception $e) {
-//            $this->debugData(['request' => $requestData, 'exception' => $e->getMessage()]);
-//            $this->_logger->error(__('Payment capturing error.'));
-            throw new \Magento\Framework\Validator\Exception(__('Payment capturing error.'));
-        }
-        return $this;
-    }
-
-    public function getIssuerList($paymentMethodCode = null)
-    {
-        $list = parent::getIssuerList(PayPal::PMCODE);
-
-        $arr = array();
-        foreach($list as $issuer)
-        {
-            array_push($arr,[
-                'name' => $issuer->Description,
-                'code' => $issuer->IssuerKeyword,
-            ]);
-        }
-
-        return $arr;
-
+        $this->issuerFactory = $issuerFactory;;
     }
     
-    /**
-     * Checkout redirect URL getter for onepage checkout (hardcode)
-     *
-     * @see \Magento\Checkout\Controller\Onepage::savePaymentAction()
-     * @see Quote\Payment::getCheckoutRedirectUrl()
-     * @return string
-     */
-    public function getCheckoutRedirectUrl()
-    {
-        return $this->_urlBuilder->getUrl('icepay/checkout/placeorder');
-    }
-    
-    /**
-     * Availability for currency
-     *
-     * @param string $currencyCode
-     * @return bool
-     */
-    public function canUseForCurrency($currencyCode)
-    {
-//        if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
-//            return false;
-//        }
-        return true;
-    }
-
-
-    /**
-     * Authorize payment
-     *
-     * @param \Magento\Framework\DataObject|\Magento\Payment\Model\InfoInterface|Payment $payment
-     * @param float $amount
-     * @return $this
-     */
-    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
-        return $this->_placeOrder($payment, $amount);
-    }
-
 }

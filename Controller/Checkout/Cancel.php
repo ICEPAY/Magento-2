@@ -1,9 +1,10 @@
 <?php
 /**
- *
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+ 
 namespace Icepay\IcpCore\Controller\Checkout;
 
 use Magento\Framework\Controller\ResultFactory;
@@ -18,7 +19,6 @@ class Cancel extends \Icepay\IcpCore\Controller\AbstractCheckout
     public function execute()
     {
         try {
-
             //TODO: check if payment was canceled or failed
 
 
@@ -48,6 +48,4 @@ class Cancel extends \Icepay\IcpCore\Controller\AbstractCheckout
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         return $resultRedirect->setPath('checkout/cart');
     }
-
-
 }

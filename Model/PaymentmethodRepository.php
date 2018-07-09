@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+ 
 namespace Icepay\IcpCore\Model;
 
 use Icepay\IcpCore\Api\Data;
@@ -60,15 +65,15 @@ class PaymentmethodRepository implements PaymentmethodRepositoryInterface
      * @param DataObjectProcessor $dataObjectProcessor
      */
     public function __construct(
-          ResourcePaymentmethod $resource,
-          PaymentmethodFactory $paymentmethodFactory,
+        ResourcePaymentmethod $resource,
+        PaymentmethodFactory $paymentmethodFactory,
         \Icepay\IcpCore\Api\Data\PaymentmethodInterfaceFactory $dataPaymentmethodFactory,
         PaymentmethodCollectionFactory $paymentmethodCollectionFactory,
         Data\PaymentmethodSearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor
-    )
-    {
+    ) {
+    
         $this->resource = $resource;
         $this->paymentmethodFactory = $paymentmethodFactory;
         $this->paymentmethodCollectionFactory = $paymentmethodCollectionFactory;
@@ -206,5 +211,4 @@ class PaymentmethodRepository implements PaymentmethodRepositoryInterface
     {
         return $this->delete($this->getById($paymentmethodId));
     }
-
 }

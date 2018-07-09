@@ -1,6 +1,7 @@
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
 
 /* eslint-disable no-undef */
@@ -16,7 +17,8 @@ require([
 ], function (jQuery, tinyMCE, confirm) {
     'use strict';
 
-    function syncPaymentMethods(url) {
+    function syncPaymentMethods(url)
+    {
         confirm({
             content: 'Are you sure you want to retrieve payment method information from ICEPAY payment gateway?',
             actions: {

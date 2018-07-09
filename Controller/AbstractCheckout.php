@@ -1,8 +1,10 @@
 <?php
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+ 
 namespace Icepay\IcpCore\Controller;
 
 use Magento\Checkout\Controller\Express\RedirectLoginInterface;
@@ -116,8 +118,6 @@ abstract class AbstractCheckout extends AppAction implements RedirectLoginInterf
         \Magento\Checkout\Model\Cart $cart,
         \Magento\Checkout\Model\Type\Onepage $onepage,
         \Psr\Log\LoggerInterface $logger
-
-
     ) {
         $this->_customerSession = $customerSession;
         $this->_checkoutSession = $checkoutSession;
@@ -242,7 +242,4 @@ abstract class AbstractCheckout extends AppAction implements RedirectLoginInterf
         }
         return false;
     }
-
-
-
 }

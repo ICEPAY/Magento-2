@@ -1,7 +1,8 @@
 <?php
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
 
 namespace Icepay\IcpCore\Model\PaymentMethod;
@@ -13,8 +14,7 @@ use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 
-
-class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
+abstract class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 {
 
     /**
@@ -107,7 +107,6 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 
         $this->_moduleList = $moduleList;
         $this->_localeDate = $localeDate;
-
     }
 
 
@@ -117,10 +116,10 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 
         $pmethodFilter = $this->filterBuilder->setField('code')->setValue($this->icepayMethodCode)->setConditionType('eq')->create();
 
-        $storeFilters = array(
+        $storeFilters = [
             $this->filterBuilder->setField('store_id')->setValue((int)$store->getId())->setConditionType('eq')->create(),
             $this->filterBuilder->setField('store_id')->setValue(0)->setConditionType('eq')->create()
-        );
+        ];
 
         $this->searchCriteriaBuilder->addFilters([$pmethodFilter]);
         $this->searchCriteriaBuilder->addFilters($storeFilters);
@@ -129,11 +128,9 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
             $this->searchCriteriaBuilder->create()
         )->getItems());
 
-        if(1 == count($collection))
-        {
+        if (1 == count($collection)) {
             $this->paymentMethod = reset($collection);
-        }
-        else {
+        } else {
             foreach ($collection as $pmethod) {
                 if (0 != $pmethod->getStoreId()) {
                     $this->paymentMethod = $pmethod;
@@ -142,10 +139,9 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
             }
         }
 
-        if($this->paymentMethod)
-        {
+        if ($this->paymentMethod) {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $mt = $objectManager->create('Icepay_Webservice_Paymentmethod');
+            $mt = $objectManager->create('Icepay\API\Icepay_Webservice_Paymentmethod');
             $pmData = $this->paymentMethod->getRawPmData();
             $method = $mt->loadFromArray(unserialize($pmData));
             $this->paymentMethodInformation = $method;
@@ -155,6 +151,7 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * Determine method availability based on quote amount, country and currency
+     * TODO: use specifications
      *
      * @param \Magento\Quote\Api\Data\CartInterface|null $quote
      * @return bool
@@ -165,9 +162,8 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
             return false;
         }
 
-        if ($quote)
-        {
-//            if ($this->paymentMethodInformation == null) {
+        if ($quote) {
+        //            if ($this->paymentMethodInformation == null) {
 //                $this->initPaymentMethodInformation();
 //            }
             $countryCode = $this->countryProvider->getCountry($quote);
@@ -178,30 +174,65 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
                 ->filterByAmount($quote->getBaseGrandTotal() * 100);
 
             $available = false;
-            foreach ($pMethod->getFilteredPaymentmethods() as $value)
-            {
-                if ($value->PaymentMethodCode === $this->icepayMethodCode)
-                {
+            foreach ($pMethod->getFilteredPaymentmethods() as $value) {
+                if ($value->PaymentMethodCode === $this->icepayMethodCode) {
                     $available = true;
                     break;
                 }
             }
-            if(!$available) return false;
+            if (!$available) {
+                return false;
+            }
         }
 
         return parent::isAvailable($quote);
     }
 
 
-    protected function getIssuerList($paymentMethodCode)
+    public function getIssuerList(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if($this->paymentMethodInformation == null)
-        {
+        if ($this->paymentMethodInformation == null) {
             $this->initPaymentMethodInformation();
         }
 
+        $paymentMethodCode = static::PMCODE;
+
+        if (is_null($quote)) {
+            $countryCode = null;
+        } else {
+            $countryCode = $this->countryProvider->getCountry($quote);
+        }
+
         $pMethod = $this->paymentMethodInformation->selectPaymentMethodByCode($paymentMethodCode);
-        return $pMethod->getIssuers();
+        $list = $pMethod->getIssuers();
+
+
+        $arr = [];
+        foreach ($list as $issuer) {
+            foreach ($issuer->Countries as $country) {
+                if ( is_null($countryCode) || strtoupper($country->CountryCode) == strtoupper($countryCode) || $country->CountryCode == "00") {
+                    array_push($arr, [
+                        'name' => $issuer->Description,
+                        'code' => $issuer->IssuerKeyword,
+                    ]);
+                }
+            }
+        }
+
+        return $arr;
+
+    }
+    
+    /**
+     * Checkout redirect URL getter for onepage checkout
+     *
+     * @see \Magento\Checkout\Controller\Onepage::savePaymentAction()
+     * @see Quote\Payment::getCheckoutRedirectUrl()
+     * @return string
+     */
+    public function getCheckoutRedirectUrl()
+    {
+        return $this->_urlBuilder->getUrl('icepay/checkout/placeorder');
     }
 
 
@@ -226,8 +257,6 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
             $additionalData->getData('issuer')
         );
         return $this;
-
-
     }
 
     /**
@@ -265,13 +294,7 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-//        $icepayTransactionData = $this->_checkoutSession->getIcepayTransactionData();
-//        if (!isset($icepayTransactionData)) {
-//            throw new LocalizedException(__('ICEPAY result is not set. Order is canceled or already created.'));
-//        } else {
-//            $this->_importToPayment($icepayTransactionData, $payment);
-//        }
-        
+
         $order = $payment->getOrder();
         //$orderTransactionId = $payment->getTransactionId().'-order';
 
@@ -301,42 +324,9 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
 
-    /**
-     * Import payment info to payment
-     *
-     * @param Icepay_Result $icepayResult
-     * @param Payment $payment
-     * @return void
-     */
-    protected function _importToPayment($icepayResult, $payment)
-    {
-        
-        $payment->setTransactionId(
-            $icepayResult->transactionID
-        )->setIsTransactionClosed(
-            0
-        );
-
-        //TODO: refactor
-        if($icepayResult->status === "OPEN") {
-            $payment->setIsTransactionPending(true);
-        }
-        else if($icepayResult->status === "OK") {
-            $payment->setIsTransactionApproved(true);
-        }
-        else
-        {
-            $payment->setIsTransactionApproved(false);
-            $payment->setIsTransactionPending(false); //TODO: Check if redundant
-        }
-
-    }
-
-
     public function getPaymentMethodDisplayName()
     {
-        if($this->paymentMethodInformation == null)
-        {
+        if ($this->paymentMethodInformation == null) {
             $this->initPaymentMethodInformation();
         }
         return $this->paymentMethod->getDisplayName();
@@ -373,6 +363,4 @@ class IcepayAbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
         }
         return $this->_storeManager;
     }
-
-
 }

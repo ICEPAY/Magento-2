@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
 
 namespace Icepay\IcpCore\Block\Adminhtml\Paymentmethod\Sync;
 
@@ -59,18 +64,15 @@ class SyncButton implements ButtonProviderInterface
      */
     public function getSyncUrl()
     {
-        $params = array('_current' => true);
+        $params = ['_current' => true];
 
         if ($this->context->getRequest()->getParam('store')) {
             $params['store'] = (int)$this->context->getRequest()->getParam('store');
-        }
-        else if ($this->context->getRequest()->getParam('website'))
-        {
+        } elseif ($this->context->getRequest()->getParam('website')) {
             $params['website'] = (int)$this->context->getRequest()->getParam('website');
         }
 
         return $this->getUrl('*/*/sync', $params);
-
     }
 
     /**
@@ -84,6 +86,4 @@ class SyncButton implements ButtonProviderInterface
     {
         return $this->context->getUrlBuilder()->getUrl($route, $params);
     }
-
-
 }

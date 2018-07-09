@@ -1,11 +1,16 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
 
 namespace Icepay\IcpCore\Model\ConfigProvider;
 
 class IDeal extends AbstractConfigProvider
 {
     /**
-     * 
+     *
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\IDeal::CODE;
 
@@ -14,7 +19,8 @@ class IDeal extends AbstractConfigProvider
      */
     public function getConfig()
     {
-        return $this->method->isAvailable() ? [
+        $quote = $this->checkoutSession->getQuote();
+        return $this->method->isAvailable($quote) ? [
             'payment' => [
                 'icepay' => [
                     'ideal' => [
@@ -27,5 +33,4 @@ class IDeal extends AbstractConfigProvider
             ],
         ] : [];
     }
-
 }

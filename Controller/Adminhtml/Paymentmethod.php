@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
 
 namespace Icepay\IcpCore\Controller\Adminhtml;
 
@@ -12,8 +17,8 @@ abstract class Paymentmethod extends \Magento\Backend\App\Action
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
-    )
-    {
+    ) {
+    
         $this->resultPageFactory = $resultPageFactory;
         $this->resultForwardFactory = $resultForwardFactory;
         $this->resultRedirectFactory = $context->getResultRedirectFactory();
@@ -36,5 +41,4 @@ abstract class Paymentmethod extends \Magento\Backend\App\Action
         );
         return $this;
     }
-
 }

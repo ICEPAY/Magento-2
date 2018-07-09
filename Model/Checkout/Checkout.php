@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+ 
 namespace Icepay\IcpCore\Model\Checkout;
 
 //TODO: replace
@@ -356,7 +362,6 @@ class Checkout
         /** @var \Magento\Sales\Model\Order $order */
         $order = $orderId ? $this->_orderFactory->create()->load($orderId) : false;
         if ($order && $order->getId() && $order->getQuoteId() == $this->_getCheckoutSession()->getQuoteId()) {
-
             $this->quote = $this->quoteRepository->get($order->getQuoteId()); //TODO
 
 
@@ -444,9 +449,8 @@ class Checkout
      */
     protected function getIcepayApiPaymentObject()
     {
-        if (null === $this->paymentObject)
-        {
-            $this->paymentObject = $this->_objectManager->get('Icepay_PaymentObject');
+        if (null === $this->paymentObject) {
+            $this->paymentObject = $this->_objectManager->get('Icepay\API\Icepay_PaymentObject');
         }
         return $this->paymentObject;
     }
@@ -457,7 +461,7 @@ class Checkout
     protected function getIcepayApiWebserviceObject()
     {
         if (null === $this->webserviceObject) {
-            $this->webserviceObject = $this->_objectManager->get('Icepay_Webservice_Pay');
+            $this->webserviceObject = $this->_objectManager->get('Icepay\API\Icepay_Webservice_Pay');
         }
         return $this->webserviceObject;
     }
@@ -481,19 +485,32 @@ class Checkout
             $this->prepareGuestQuote();
         }
 
+        if ($this->getCheckoutMethod() == \Magento\Checkout\Model\Type\Onepage::METHOD_CUSTOMER) {
+            $billingAddress = $this->quote->getBillingAddress();
+            //TODO: improve
+            if (is_null($billingAddress->getCustomerName()) && is_null($billingAddress->getCustomerAddress())) {
+
+                $currentCustomer = $this->getCustomer();
+                $defaultShippingAddressId = $currentCustomer->getDefaultShipping();
+                $defaultBillingAddressId = $currentCustomer->getDefaultBilling();
+
+                if ($defaultShippingAddressId &&
+                    (!$defaultBillingAddressId || ($defaultBillingAddressId === $defaultShippingAddressId))) {
+                    //set billing address same as shipping
+                    $shippingAddressData = $this->_accountManagement->getDefaultShippingAddress($currentCustomer->getId());
+                    $this->quote->getBillingAddress()->importCustomerAddressData($shippingAddressData);
+                }
+            }
+        }
+
         $this->quote->collectTotals();
         $orderId = $this->cartManagement->placeOrder($this->quote->getId());
-//        $order = $this->cartManagement->submit($this->quote);
 
         if (!$orderId) {
             return;
         }
-
-//        $this->_order = $order;
         $this->_order = $this->_orderFactory->create()->load($orderId);
     }
-
-
 
     /**
      * Return order
@@ -535,6 +552,15 @@ class Checkout
         return $this->_customerSession;
     }
 
+    /**
+     * Get current customer object
+     *
+     * @return \Magento\Customer\Api\Data\CustomerInterface
+     */
+    public function getCustomer()
+    {
+        return $this->_customerSession->getCustomerDataObject();
+    }
 
     /**
      * Prepare quote for guest checkout order submit
@@ -550,6 +576,4 @@ class Checkout
             ->setCustomerGroupId(\Magento\Customer\Model\Group::NOT_LOGGED_IN_ID);
         return $this;
     }
-
-
 }

@@ -1,8 +1,10 @@
 <?php
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+ 
 namespace Icepay\IcpCore\Model\PaymentMethod;
 
 use Icepay\IcpCore\Model\Icepay;
@@ -186,39 +188,6 @@ class IDeal extends IcepayAbstractMethod
         $this->_exception = $exception;
         $this->transactionRepository = $transactionRepository;
         $this->issuerFactory = $issuerFactory;
-
     }
-
-
-    public function getIssuerList($paymentMethodCode = null)
-    {
-        $list = parent::getIssuerList(IDeal::PMCODE);
-
-        $arr = array();
-        foreach($list as $issuer)
-        {
-            array_push($arr,[
-                'name' => $issuer->Description,
-                'code' => $issuer->IssuerKeyword,
-            ]);
-        }
-
-        return $arr;
-
-    }
-
-    /**
-     * Checkout redirect URL getter for onepage checkout (hardcode)
-     *
-     * @see \Magento\Checkout\Controller\Onepage::savePaymentAction()
-     * @see Quote\Payment::getCheckoutRedirectUrl()
-     * @return string
-     */
-    public function getCheckoutRedirectUrl()
-    {
-        return $this->_urlBuilder->getUrl('icepay/checkout/placeorder');
-    }
-
     
-
 }

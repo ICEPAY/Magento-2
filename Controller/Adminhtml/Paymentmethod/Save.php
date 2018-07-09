@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+
 namespace Icepay\IcpCore\Controller\Adminhtml\Paymentmethod;
 
 class Save extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
@@ -19,8 +25,8 @@ class Save extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager
-    )
-    {
+    ) {
+    
         $this->formKeyValidator = $context->getFormKeyValidator();
         $this->paymentmethodFactory = $paymentmethodFactory;
         $this->transportBuilder = $transportBuilder;
@@ -48,7 +54,6 @@ class Save extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
 
         if ($paymentmethod && $paymentmethod->getId()) {
             try {
-
                 $paymentmethod->setIsActive($pmEnabled);
                 $paymentmethod->setDisplayName($pmDisplayName);
 
@@ -59,8 +64,7 @@ class Save extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
                 if ($this->getRequest()->getParam('back')) {
                     return $resultRedirect->setPath('*/*/edit', ['id' => $paymentmethod->getId()]);
                 }
-
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->messageManager->addError(__('Error with editing payment method action.'));
             }
         }
@@ -78,6 +82,4 @@ class Save extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
     {
         return $this->_authorization->isAllowed('Icepay_IcpCore::paymentmethod_save');
     }
-
-
 }

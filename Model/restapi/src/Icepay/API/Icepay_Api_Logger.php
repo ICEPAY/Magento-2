@@ -5,10 +5,13 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_Api_Logger {
+namespace Icepay\API;
+
+class Icepay_Api_Logger
+{
 
     private static $instance;
 
@@ -90,11 +93,13 @@
     {
         $this->_logToHook = $bool;
 
-        if (class_exists($className))
+        if (class_exists($className)) {
             $this->_logHookClass = new $className;
+        }
 
-        if (is_callable($logFunction))
+        if (is_callable($logFunction)) {
             $this->_logHookFunc = $logFunction;
+        }
 
         return $this;
     }
@@ -109,8 +114,9 @@
      */
     public function setLoggingDirectory($dirName = null)
     {
-        if ($dirName)
+        if ($dirName) {
             $this->_loggingDirectory = $dirName;
+        }
 
         return $this;
     }
@@ -125,8 +131,9 @@
      */
     public function setLoggingFile($fileName = null)
     {
-        if ($fileName)
+        if ($fileName) {
             $this->_loggingFile = $fileName;
+        }
 
         return $this;
     }
@@ -167,13 +174,13 @@
     }
 
     /*
-     * Set the logging flag
-     *
-     * @since 2.1.0
-     * @access private
-     * @param int $flag
-     * @param bool $boolean
-     */
+    * Set the logging flag
+    *
+    * @since 2.1.0
+    * @access private
+    * @param int $flag
+    * @param bool $boolean
+    */
 
     private function _setLoggingFlag($flag, $boolean = true)
     {
@@ -185,13 +192,13 @@
     }
 
     /*
-     * Check if type is exists
-     *
-     * @since 2.1.0
-     * @access private
-     * @param int $type
-     * @return bool
-     */
+    * Check if type is exists
+    *
+    * @since 2.1.0
+    * @access private
+    * @param int $type
+    * @return bool
+    */
 
     private function _isLoggingSet($type)
     {
@@ -211,19 +218,22 @@
     public function log($line, $level = 1)
     {
         // Check if logging is enabled
-        if (!$this->_loggingEnabled)
+        if (!$this->_loggingEnabled) {
             return false;
+        }
 
         // Check if the level is within the required level
-        if (!$this->_isLoggingSet($level))
+        if (!$this->_isLoggingSet($level)) {
             return false;
+        }
 
         $dateTime = date("H:i:s", time());
         $line = "{$dateTime} [ICEPAY]: {$line}" . PHP_EOL;
 
-        // Log to Screen
-        if ($this->_logToScreen)
-            echo "{$line} <br />";
+//        // Log to Screen
+//        if ($this->_logToScreen) {
+//            echo "{$line} <br />";
+//        }
 
         // Log to Hooked Class
         if ($this->_logToHook && $this->_logHookClass && $this->_logHookFunc) {
@@ -240,8 +250,8 @@
                 $fp = fopen($file, "a");
                 fwrite($fp, $line);
                 fclose($fp);
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage());
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage());
             };
         }
     }
@@ -267,9 +277,9 @@
      */
     public static function getInstance()
     {
-        if (!self::$instance)
+        if (!self::$instance) {
             self::$instance = new self();
+        }
         return self::$instance;
     }
-
 }

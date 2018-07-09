@@ -1,7 +1,9 @@
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+ 
 /*browser:true*/
 /*global define*/
 define(
@@ -22,20 +24,20 @@ define(
 
             issuerList: [],
 
-            getCode: function() {
+            getCode: function () {
                 return 'icepay_icpcore_creditcard';
             },
 
-            isActive: function() {
+            isActive: function () {
                 return true;
             },
 
             /** Returns payment logo image path */
-            getPaymentLogoSrc: function() {
+            getPaymentLogoSrc: function () {
                 return window.checkoutConfig.payment.icepay.creditcard.paymentMethodLogoSrc;
             },
 
-            getPaymentMethodDisplayName: function() {
+            getPaymentMethodDisplayName: function () {
                 return window.checkoutConfig.payment.icepay.creditcard.getPaymentMethodDisplayName;
             },
 
@@ -49,14 +51,14 @@ define(
             },
 
 
-            selectPaymentMethod: function() {
+            selectPaymentMethod: function () {
 
                 selectPaymentMethodAction(this.getData());
                 checkoutData.setSelectedPaymentMethod(this.item.method);
                 return true;
             },
             
-            getData: function() {
+            getData: function () {
                 var parent = this._super(),
                     additionalData = {};
 
@@ -68,3 +70,4 @@ define(
         });
     }
 );
+

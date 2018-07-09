@@ -1,7 +1,9 @@
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+ 
 /*browser:true*/
 /*global define*/
 define(
@@ -11,8 +13,8 @@ define(
         'Icepay_IcpCore/js/action/set-payment-method',
         'Magento_Checkout/js/model/payment/additional-validators'
     ],
-    function ($, Component, setPaymentMethodAction, additionalValidators)
-    {
+    function ($, Component, setPaymentMethodAction, additionalValidators) {
+    
         'use strict';
 
         return Component.extend({
@@ -29,3 +31,4 @@ define(
         });
     }
 );
+

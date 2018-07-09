@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+ 
 namespace Icepay\IcpCore\Controller\Adminhtml\Paymentmethod;
 
 use Magento\Backend\App\Action;
@@ -59,7 +65,6 @@ class Edit extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
         $paymentmethod = $this->_paymentmethodFactory->create()->load($pmId);
 
         if ($paymentmethod && $paymentmethod->getId()) {
-
             $data = $this->_getSession()->getFormData(true);
             if (!empty($data)) {
                 $paymentmethod->setData($data);
@@ -82,5 +87,4 @@ class Edit extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
 
         return $resultRedirect;
     }
-
 }

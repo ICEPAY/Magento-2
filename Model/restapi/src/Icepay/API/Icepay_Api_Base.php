@@ -4,10 +4,13 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_Api_Base {
+namespace Icepay\API;
+
+class Icepay_Api_Base
+{
 
     private $_pinCode;
     protected $_merchantID;
@@ -18,15 +21,15 @@
     protected $_language = null;
     protected $_currency = null;
     protected $_version = "1.0.2";
-    protected $_doIPCheck = array();
-    protected $_whiteList = array();
+    protected $_doIPCheck = [];
+    protected $_whiteList = [];
     protected $data;
     protected $_logger;
 
     public function __construct()
     {
         $this->_logger = Icepay_Api_Logger::getInstance();
-        $this->data = new stdClass();
+        $this->data = new \stdClass();
     }
 
     /**
@@ -40,8 +43,9 @@
     public function exists($needle, $haystack = null)
     {
         $result = true;
-        if ($haystack && $result && $haystack[0] != "00")
+        if ($haystack && $result && $haystack[0] != "00") {
             $result = in_array($needle, $haystack);
+        }
         return $result;
     }
 
@@ -64,8 +68,9 @@
      */
     public function setMerchantID($merchantID)
     {
-        if (!\Icepay\API\Icepay_Parameter_Validation::merchantID($merchantID))
-            throw new Exception('MerchantID not valid');
+        if (!\Icepay\API\Icepay_Parameter_Validation::merchantID($merchantID)) {
+            throw new \Exception('MerchantID not valid');
+        }
 
         $this->_merchantID = (int) $merchantID;
 
@@ -91,8 +96,9 @@
      */
     public function setSecretCode($secretCode)
     {
-        if (!\Icepay\API\Icepay_Parameter_Validation::secretCode($secretCode))
-            throw new Exception('Secretcode not valid');
+        if (!\Icepay\API\Icepay_Parameter_Validation::secretCode($secretCode)) {
+            throw new \Exception('Secretcode not valid');
+        }
 
         $this->_secretCode = (string) $secretCode;
         return $this;
@@ -117,8 +123,9 @@
      */
     public function setPinCode($pinCode)
     {
-        if (!\Icepay\API\Icepay_Parameter_Validation::pinCode($pinCode))
-            throw new Exception('Pincode not valid');
+        if (!\Icepay\API\Icepay_Parameter_Validation::pinCode($pinCode)) {
+            throw new \Exception('Pincode not valid');
+        }
 
         $this->_pinCode = (string) $pinCode;
 
@@ -144,8 +151,9 @@
      */
     public function setSuccessURL($url = "")
     {
-        if (!isset($this->data))
-            $this->data = new stdClass();
+        if (!isset($this->data)) {
+            $this->data = new \stdClass();
+        }
 
         $this->data->ic_urlcompleted = $url;
 
@@ -160,8 +168,9 @@
      */
     public function setErrorURL($url = "")
     {
-        if (!isset($this->data))
-            $this->data = new stdClass();
+        if (!isset($this->data)) {
+            $this->data = new \stdClass();
+        }
 
         $this->data->ic_urlerror = $url;
         return $this;
@@ -193,5 +202,4 @@
     {
         return gmdate("Y-m-d\TH:i:s\Z");
     }
-
 }

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
 
 namespace Icepay\IcpCore\Model\ConfigProvider;
 
@@ -23,18 +28,26 @@ class AbstractConfigProvider implements ConfigProviderInterface
     protected $assetRepo;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
      * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Magento\Framework\Escaper $escaper
      * @param \Magento\Framework\View\Asset\Repository $assetRepo
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      */
     public function __construct(
         \Magento\Payment\Helper\Data $paymentHelper,
         \Magento\Framework\Escaper $escaper,
-        \Magento\Framework\View\Asset\Repository $assetRepo
+        \Magento\Framework\View\Asset\Repository $assetRepo,
+        \Magento\Checkout\Model\Session $checkoutSession
     ) {
         $this->escaper = $escaper;
         $this->method = $paymentHelper->getMethodInstance($this->methodCode);
         $this->assetRepo = $assetRepo;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -47,7 +60,8 @@ class AbstractConfigProvider implements ConfigProviderInterface
 
     protected function getIssuerList()
     {
-        return $this->method->getIssuerList();
+        $quote = $this->checkoutSession->getQuote();
+        return $this->method->getIssuerList($quote);
     }
 
     /**
@@ -75,6 +89,4 @@ class AbstractConfigProvider implements ConfigProviderInterface
     {
         return $this->method->getPaymentMethodDisplayName();
     }
-
-
 }

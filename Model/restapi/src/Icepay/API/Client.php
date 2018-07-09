@@ -1,12 +1,14 @@
-<?php namespace Icepay\API;
+<?php
 
 /**
  * ICEPAY REST API for PHP
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
+
+namespace Icepay\API;
 
 use Icepay\API\Resources\Payment;
 use Icepay\API\Resources\Refund;
@@ -58,8 +60,9 @@ class Client
 
     public static function getInstance()
     {
-        if (!self::$instance)
+        if (!self::$instance) {
             self::$instance = new self();
+        }
         return self::$instance;
     }
 
@@ -140,7 +143,7 @@ class Client
      * @return mixed
      * @throws \Exception
      */
-    public function request($method, $api_method, $body = NULL, $checksum)
+    public function request($method, $api_method, $body = null, $checksum)
     {
         /**
          * Check if the Merchant ID is set
@@ -183,10 +186,10 @@ class Client
          * Set the curl options
          */
         curl_setopt($this->ch, CURLOPT_URL, $this->api_endpoint . $api_method);
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->ch, CURLOPT_TIMEOUT, 15);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($this->ch, CURLOPT_HEADER, TRUE);
+        curl_setopt($this->ch, CURLOPT_HEADER, true);
 
         /**
          * Possible output: 5.6.9
@@ -196,17 +199,17 @@ class Client
         /**
          * Prepare the curl headers
          */
-        $api_headers = array(
+        $api_headers = [
             "MerchantID: {$this->api_key}",
             "Checksum: {$checksum}",
             "User-Agent: ICEPAY API/{$this->api_version} PHP/{$php_version}",
             "Accept: application/json"
-        );
+        ];
 
         /**
          * If the body is not null, let curl post the request as json content
          */
-        if ($body !== NULL) {
+        if ($body !== null) {
             $api_headers[] = "Content-Type: application/json";
 
             curl_setopt($this->ch, CURLOPT_POST, 1);
@@ -222,7 +225,7 @@ class Client
          * Set the SSL options
          */
         curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, TRUE);
+        curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, true);
 
         /**
          * Execute the request
@@ -244,7 +247,7 @@ class Client
 //         * This webserver simply will not accept it and we need to connect.
 //         */
 //        Uncommenting this code block can be insecure, use at your own risk
-        if (strpos(curl_error($this->ch), 'certificate subject name') !== FALSE) {
+        if (strpos(curl_error($this->ch), 'certificate subject name') !== false) {
             curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 0);
 
             $response = curl_exec($this->ch);
@@ -254,12 +257,11 @@ class Client
          * Check if we got any error, if so, exception it
          */
         if (curl_errno($this->ch)) {
-
             $exception_no = curl_errno($this->ch);
             $exception = curl_error($this->ch);
 
             curl_close($this->ch);
-            $this->ch = NULL;
+            $this->ch = null;
 
             throw new \Exception('Unable to reach the ICEPAY payment server (' . $exception_no . '):' . $exception);
         }
@@ -299,9 +301,7 @@ class Client
             if ($checksumVerification != $parsed_headers[0]["Checksum"]) {
                 throw new \Exception("Response checksum invalid");
             }
-        }
-        else
-        {
+        } else {
             //if no checksum header was present in the response, the most likely cause is that the sender ID was invalid
             throw new \Exception("Response checksum not found. Verify your merchant ID.");
         }
@@ -324,7 +324,7 @@ class Client
 
     private function parse_headers($headertext)
     {
-        $headers = array();
+        $headers = [];
 
         /**
          * Split headers by newline
@@ -335,7 +335,6 @@ class Client
          * Stop at last item: it's just the empty line to separate the headers from the body
          */
         for ($index = 0; $index < count($rawHeaders) - 1; $index++) {
-
             foreach (explode("\r\n", $rawHeaders[$index]) as $i => $line) {
                 if ($i === 0) {
                     $headers[$index]['http_code'] = $line;

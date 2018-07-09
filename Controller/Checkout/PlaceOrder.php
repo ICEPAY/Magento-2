@@ -1,13 +1,15 @@
 <?php
 /**
- *
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+
 namespace Icepay\IcpCore\Controller\Checkout;
 
 use Magento\TestFramework\Inspection\Exception;
 use Magento\Checkout\Model\Type\Onepage;
+use Magento\Framework\Controller\ResultFactory;
 
 /**
  * Class PlaceOrder
@@ -31,6 +33,7 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
     public function execute()
     {
         $errorMessage = 'unknown error';
+        $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
 
         try {
             $this->initCheckout();
@@ -65,15 +68,12 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
             );
             $url = $this->checkout->getRedirectUrl();
             if ($success && $url) {
-                $this->getResponse()->setRedirect($url);
-                return;
+                return $resultRedirect->setPath($url, ['_secure' => true]);
             }
-        }
-        catch (\Magento\Framework\Exception\LocalizedException $e) {
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $errorMessage = $e->getMessage();
             $this->messageManager->addExceptionMessage($e, $errorMessage);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
             $this->messageManager->addExceptionMessage(
                 $e,
@@ -82,21 +82,20 @@ class PlaceOrder extends \Icepay\IcpCore\Controller\AbstractCheckout
         }
 
         if (isset($this->checkout)) {
-
             // if there is an order - cancel it
-            $orderId = $this->getCheckoutSession()->getLastOrderId();
             /** @var \Magento\Sales\Model\Order $order */
-            $order = $orderId ? $this->_orderFactory->create()->load($orderId) : false;
-            
-            $this->cancelOrder($this->checkout->getOrder(), 'Order was cancelled due to a system error: ' . $errorMessage);
-            $this->messageManager->addErrorMessage(
-                __('Order was cancelled due to a system error.')
-            );
-            $this->getCheckoutSession()->restoreQuote();
+            $order = $this->checkout ?  $this->checkout->getOrder() : false;//$this->getCheckoutSession()->getLastOrderId();
+
+            if($order) {
+                $this->cancelOrder($order, 'Order was cancelled due to a system error: ' . $errorMessage);
+                $this->messageManager->addErrorMessage(
+                    __('Order was cancelled due to a system error.')
+                );
+                $this->getCheckoutSession()->restoreQuote();
+            }
         }
 
-        $this->_redirect('checkout/cart');
+        return $resultRedirect->setPath('checkout/cart', ['_secure' => true]);
+
     }
-
-
 }

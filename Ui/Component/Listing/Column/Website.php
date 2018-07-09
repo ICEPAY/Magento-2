@@ -1,8 +1,10 @@
 <?php
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
  */
+ 
 namespace Icepay\IcpCore\Ui\Component\Listing\Column;
 
 use Magento\Framework\Escaper;
@@ -83,6 +85,4 @@ class Website extends Column
             $this->_data['config']['componentDisabled'] = true;
         }
     }
-
-
 }

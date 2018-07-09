@@ -4,10 +4,13 @@
  *
  * @version     0.0.2 Magento 2
  * @license     BSD-2-Clause, see LICENSE.md
- * @copyright   (c) 2016, ICEPAY B.V. All rights reserved.
+ * @copyright   (c) 2016-2018, ICEPAY B.V. All rights reserved.
  */
 
- class Icepay_StatusCode {
+namespace Icepay\API;
+
+class Icepay_StatusCode
+{
 
     const OPEN = "OPEN";
     const AUTHORIZED = "AUTHORIZED";
@@ -16,5 +19,4 @@
     const SUCCESS = "OK";
     const REFUND = "REFUND";
     const CHARGEBACK = "CBACK";
-
 }

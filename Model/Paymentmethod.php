@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package       ICEPAY Magento 2 Payment Module
+ * @copyright     (c) 2016-2018 ICEPAY. All rights reserved.
+ * @license       BSD 2 License, see LICENSE.md
+ */
+ 
 namespace Icepay\IcpCore\Model;
 
 use Icepay\IcpCore\Api\Data\PaymentmethodInterface;
@@ -18,10 +24,15 @@ class Paymentmethod extends \Magento\Framework\Model\AbstractModel implements Pa
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection =
         null,
         array $data = []
-    )
-    {
-        parent::__construct($context, $registry, $resource,
-            $resourceCollection, $data);
+    ) {
+    
+        parent::__construct(
+            $context,
+            $registry,
+            $resource,
+            $resourceCollection,
+            $data
+        );
     }
 
     public function _construct()
@@ -41,9 +52,7 @@ class Paymentmethod extends \Magento\Framework\Model\AbstractModel implements Pa
             $icepay->setCompletedURL('...');
             $icepay->setErrorURL('...');
             return $icepay->payment->getMyPaymentMethods();
-
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
