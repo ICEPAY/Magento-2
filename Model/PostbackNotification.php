@@ -14,7 +14,7 @@ use Magento\Store\Model\ScopeInterface;
 use Icepay_StatusCode;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
+use Magento\Sales\Model\Order\Email\Sender\OrderCommentSender;
 
 
 class PostbackNotification implements PostbackNotificationInterface
@@ -44,7 +44,20 @@ class PostbackNotification implements PostbackNotificationInterface
     protected $encryptor;
 
     /**
-     * @var \Magento\Sales\Model\Order $order
+     * @var \Magento\Sales\Model\OrderRepository
+     */
+    protected $orderRepository;
+
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var \Magento\Sales\Model\Order
+     *
+     * TODO: \Magento\Sales\Api\Data\OrderInterface $order
+     *
      */
     protected $order;
 
@@ -54,9 +67,9 @@ class PostbackNotification implements PostbackNotificationInterface
     protected $orderSender;
 
     /**
-     * @var InvoiceSender
+     * @var OrderCommentSender
      */
-    protected $invoiceSender;
+    protected $orderCommentSender;
 
     /**
      * @var \Magento\Framework\Webapi\Request $request
@@ -69,33 +82,48 @@ class PostbackNotification implements PostbackNotificationInterface
     protected $logger;
 
     /**
+     * @var \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+     */
+    protected $transactionBuilder;
+
+    /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Sales\Model\OrderRepository  $orderRepository
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteria
      * @param OrderSender $orderSender
+     * @param OrderCommentSender $orderCommentSender
      * @param \Magento\Framework\Webapi\Request $request
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param LoggerInterface $logger
+     * @param \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Sales\Model\Order $order,
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteria,
         OrderSender $orderSender,
-        InvoiceSender $invoiceSender,
+        OrderCommentSender $orderCommentSender,
         \Magento\Framework\Webapi\Request $request,
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        LoggerInterface $logger
-    )
-    {
+        LoggerInterface $logger,
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+    ) {
+    
         $this->scopeConfig = $scopeConfig;
         $this->encryptor = $encryptor;
         $this->order = $order;
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteria;
         $this->orderSender = $orderSender;
-        $this->invoiceSender = $invoiceSender;
+        $this->orderCommentSender = $orderCommentSender;
         $this->request = $request;
         $this->objectManager = $objectManager;
         $this->logger = $logger;
+        $this->transactionBuilder = $transactionBuilder;
 
         $this->icepayPostback = $this->objectManager->create('Icepay_Postback');
 
@@ -123,8 +151,6 @@ class PostbackNotification implements PostbackNotificationInterface
 
             if (!$this->order->getId()) {
                 $this->logger->debug(sprintf('Order %s not found!', $orderID));
-
-                //throw NoSuchEntityException::singleField('orderID', $orderID);
                 throw new \Magento\Framework\Webapi\Exception(
                     __(sprintf('Order %s not found!', $orderID)),
                     0,
@@ -133,43 +159,67 @@ class PostbackNotification implements PostbackNotificationInterface
             };
 
             if (!$this->validate($this->order->getStore())) {
-                $this->logger->debug(sprintf('Postback inicialization\validation failed.  %s ', print_r($this->request->getPost(), true)));
+                $this->logger->debug(sprintf('Postback initialization\validation failed.  %s ', print_r($this->request->getPost(), true)));
 
                 throw new \Magento\Framework\Webapi\Exception(
-                    __('Postback inicialization\validation failed.'),
+                    __('Postback initialization\validation failed.'),
                     0,
                     \Magento\Framework\Webapi\Exception::HTTP_UNAUTHORIZED
                 );
             }
 
+            //TODO: refactor to service contracts (repositories)
             $this->order->loadByIncrementId($this->icepayPostback->getOrderID());
 
+            $transactionId = (string)filter_input(INPUT_POST, 'TransactionID');
             $currentIcepayOrderStatus = $this->getIcepayOrderStatus($this->order->getStatus());
+            $amount = (string)filter_input(INPUT_POST, 'Amount');
 
-            if(($currentIcepayOrderStatus === "NEW" || $this->icepayPostback->canUpdateStatus($currentIcepayOrderStatus)) && $this->icepayPostback->getStatus() !== $currentIcepayOrderStatus) {
+            $this->logger->debug(sprintf('Order ID: %s, Transaction ID: %s, Current Magento Order Status: %s, Current ICEPAY Order Status: %s',
+                $this->order->getId(), $transactionId, $this->order->getStatus(), $currentIcepayOrderStatus));
+
+            if (($currentIcepayOrderStatus === "NEW" || $this->icepayPostback->canUpdateStatus($currentIcepayOrderStatus))
+                && $this->icepayPostback->getStatus() !== $currentIcepayOrderStatus) {
                 switch ($this->icepayPostback->getStatus()) {
                     case Icepay_StatusCode::OPEN:
                         $this->order->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
                         $this->order->setStatus('icepay_icpcore_open');
-                        $this->orderSender->send($this->order);
+
+                        $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
+
+                        $this->order->addStatusHistoryComment(__(
+                            'Order status has changed to OPEN.'
+                        ))->save();
+
                         $this->order->save();
 
-                        $history = $this->order->addStatusHistoryComment(__(
-                            'Transaction status has changed to OPEN.'
-                        ));
-                        $history->save();
-
+                        $this->logger->debug('Order status has changed to OPEN');
                         break;
                     case Icepay_StatusCode::SUCCESS:
                         $this->order->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
                         $this->order->setStatus('icepay_icpcore_ok');
+
+                        $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
+
+                        $this->order->addStatusHistoryComment(__(
+                            'Order has been paid successfully.'
+                        ))->save();
+
+                        if ($this->order->getCanSendNewEmailFlag()) {
+                            $this->orderSender->send($this->order);
+
+                            $history = $this->order->addStatusHistoryComment(__(
+                                'Confirmed the order to the customer via email.'
+                            ));
+                            $history->setIsCustomerNotified(true);
+                            $history->save();
+
+                            $this->logger->debug('Confirmed the order to the customer via email.');
+                        }
+
                         $this->order->save();
 
-                        $history = $this->order->addStatusHistoryComment(__(
-                            'Order has been paid successfully.'
-                        ));
-                        $history->save();
-
+                        $this->logger->debug('Order status has changed to OK');
                         break;
                     case Icepay_StatusCode::ERROR:
                         $this->order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
@@ -179,49 +229,23 @@ class PostbackNotification implements PostbackNotificationInterface
                             $this->order->cancel();
                             $this->order->setStatus('canceled');
                         }
-                        $this->orderSender->send($this->order);
+
+                        $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
+
+                        $this->order->addStatusHistoryComment(__(
+                            'Order was cancelled due to a system error.'
+                        ))->save();
+
                         $this->order->save();
 
-                        $history = $this->order->addStatusHistoryComment(__(
-                            'Order was cancelled due to a system error.'
-                        ));
-                        $history->save();
+                        //TODO:
+//                        $this->orderCommentSender->send($order, $notify, $comment);
 
+                        $this->logger->debug('Order status has changed to ERROR');
                         break;
                 }
             }
-
-            if(!$this->order->getIsNotified())
-            {
-                $this->orderSender->send($this->order, true);
-
-                $history = $this->order->addStatusHistoryComment(__(
-                    'Confirmed the order to the customer via email.'
-                ));
-                $history->setIsCustomerNotified(true);
-                $history->save();
-            }
-
-            if ($this->order->getState() == \Magento\Sales\Model\Order::STATE_PROCESSING && $this->order->canInvoice() && !$this->order->hasInvoices()) {
-
-                /**
-                 * @var \Magento\Sales\Model\Order\Payment $payment
-                 */
-                $payment = $this->order->getPayment();
-                $payment->registerCaptureNotification($this->order->getGrandTotal());
-                $payment->save();
-                $this->order->save();
-
-                foreach ($this->order->getInvoiceCollection() as $invoice) {
-                    $this->invoiceSender->send($invoice, true);
-                    $this->order->addStatusHistoryComment(
-                        __('Notified customer about invoice #%1.', $invoice->getId())
-                    )
-                        ->setIsCustomerNotified(true)
-                        ->save();
-                }
-            }
-
+            
 
         }
         catch (\Magento\Framework\Webapi\Exception $e)
@@ -237,6 +261,45 @@ class PostbackNotification implements PostbackNotificationInterface
                 0,
                 \Magento\Framework\Webapi\Exception::HTTP_INTERNAL_ERROR
             );
+        }
+    }
+
+    private function createTransaction($order, $transactionId, $paymentAmount, $paymentData)
+    {
+        try {
+            $payment = $order->getPayment();
+            $payment->setLastTransId($transactionId);
+            $payment->setTransactionId($transactionId);
+            $payment->setAdditionalInformation(
+                [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS =>  $paymentData]
+            );
+            $formatedPrice = $order->getBaseCurrency()->formatTxt(
+            //$order->getGrandTotal()
+                $paymentAmount
+            );
+
+            $message = __('Payment amount is %1.', $formatedPrice);
+            $trans = $this->transactionBuilder;
+            $transaction = $trans->setPayment($payment)
+                ->setOrder($order)
+                ->setTransactionId($transactionId)
+                ->setAdditionalInformation(
+                    [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS =>  $paymentData]
+                )
+                ->setFailSafe(true)
+                ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_PAYMENT);
+
+            $payment->addTransactionCommentsToOrder(
+                $transaction,
+                $message
+            );
+            $payment->setParentTransactionId(null);
+            $payment->save();
+//            $order->save();
+
+            return  $transaction->save()->getTransactionId();
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
         }
     }
 
