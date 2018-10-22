@@ -195,8 +195,8 @@ class PostbackNotification implements PostbackNotificationInterface
 
                         $this->logger->debug('Order status has changed to OPEN');
                         break;
-                    case Icepay_StatusCode::SUCCESS:    
-                        $this->order->setState(\Magento\Sales\Model\Order::STATE_NEW);
+                    case Icepay_StatusCode::SUCCESS:
+                        $this->order->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
                         $this->order->setStatus('icepay_icpcore_ok');
 
                         $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
