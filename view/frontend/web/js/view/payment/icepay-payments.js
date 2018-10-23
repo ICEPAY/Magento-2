@@ -60,6 +60,10 @@ define(
             {
                 type: 'icepay_icpcore_wiretransfer',
                 component: 'Icepay_IcpCore/js/view/payment/method-renderer/wiretransfer'
+            },
+            {
+                type: 'icepay_icpcore_creditclick',
+                component: 'Icepay_IcpCore/js/view/payment/method-renderer/creditclick'
             }
         );
         /** Add view logic here if needed */

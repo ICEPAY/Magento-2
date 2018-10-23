@@ -94,6 +94,14 @@
                 <allowspecific>0</allowspecific>
                 <group>icepay</group>
             </icepay_icpcore_wiretransfer>
+            <icepay_icpcore_creditclick>
+                <active>1</active>
+                <model>Icepay\IcpCore\Model\PaymentMethod\CreditClick</model>
+                <payment_action>order</payment_action>
+                <title>CreditClick</title>
+                <allowspecific>0</allowspecific>
+                <group>icepay</group>
+            </icepay_icpcore_creditclick>
         </payment>
     </default>
 </config>

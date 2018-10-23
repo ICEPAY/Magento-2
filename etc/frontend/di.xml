@@ -16,6 +16,7 @@
                 <item name="icepay_phone_config_provider" xsi:type="object">Icepay\IcpCore\Model\ConfigProvider\Phone</item>
                 <item name="icepay_sms_config_provider" xsi:type="object">Icepay\IcpCore\Model\ConfigProvider\Sms</item>
                 <item name="icepay_wiretransfer_config_provider" xsi:type="object">Icepay\IcpCore\Model\ConfigProvider\WireTransfer</item>
+                <item name="icepay_creditclick_config_provider" xsi:type="object">Icepay\IcpCore\Model\ConfigProvider\CreditClick</item>
             </argument>
         </arguments>
     </type>

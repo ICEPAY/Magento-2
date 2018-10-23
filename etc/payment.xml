@@ -42,6 +42,9 @@
         <method name="icepay_icpcore_wiretransfer">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="icepay_icpcore_creditclick">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
     </methods>
 </payment>
 
