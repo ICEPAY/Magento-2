@@ -136,6 +136,8 @@ Afterwards click on **Actions** -> **Enable** or **Disable** selection
 ![alt tag](https://github.com/ICEPAY/Magento-2/wiki/images/IMG%2011.png)
 
 Click on **SYNC** button to retreive **ICEPAY** payment methods for an individual store.
+
+At the moment, our module does not support multishipping.
     
 Contributing
 ------------
