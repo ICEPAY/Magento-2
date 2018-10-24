@@ -15,6 +15,8 @@ Our module is available under the BSD-2-Clause. See the [LICENSE](https://github
 Installation
 ------------
 
+Below is a concise installation guide. A more detailed installation and configuration instruction is available [here](https://github.com/ICEPAY/Magento-2/wiki).
+
 ### Install by Composer:
 
 1. Go to the Magento 2 root folder
