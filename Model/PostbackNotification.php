@@ -168,7 +168,7 @@ class PostbackNotification implements PostbackNotificationInterface
 
             $transactionId = (string)filter_input(INPUT_POST, 'TransactionID');
             $currentIcepayOrderStatus = $this->getIcepayOrderStatus($this->order->getStatus());
-            $amount = (string)filter_input(INPUT_POST, 'Amount');
+            $amount = ((int)filter_input(INPUT_POST, 'Amount'))/100;
 
             $this->logger->debug(sprintf('Order ID: %s, Transaction ID: %s, Current Magento Order Status: %s, Current ICEPAY Order Status: %s',
                 $this->order->getId(), $transactionId, $this->order->getStatus(), $currentIcepayOrderStatus));
