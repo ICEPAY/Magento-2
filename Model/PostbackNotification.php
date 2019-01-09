@@ -227,9 +227,7 @@ class PostbackNotification implements PostbackNotificationInterface
 
                         $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
 
-                        $this->order->addStatusHistoryComment(__(
-                            'Order was cancelled due to a system error.'
-                        ))->save();
+                        $this->order->addStatusHistoryComment($this->icepayPostback->getTransactionString())->save();
 
                         $this->order->save();
 
