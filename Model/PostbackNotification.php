@@ -217,13 +217,12 @@ class PostbackNotification implements PostbackNotificationInterface
                         $this->logger->debug('Order status has changed to OK');
                         break;
                     case Icepay_StatusCode::ERROR:
-                        $this->order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
-                        $this->order->setStatus('icepay_icpcore_error');
 
                         if ($this->order->canCancel()) {
                             $this->order->cancel();
-                            $this->order->setStatus('canceled');
                         }
+
+                        $this->order->setStatus('icepay_icpcore_error');
 
                         $this->createTransaction($this->order, $transactionId, $amount, $this->icepayPostback->getTransactionString());
 
