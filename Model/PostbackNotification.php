@@ -10,6 +10,7 @@ namespace Icepay\IcpCore\Model;
 //TODO: replace
 require_once(dirname(__FILE__) . '/restapi/src/Icepay/API/Autoloader.php');
 use Icepay\IcpCore\Api\PostbackNotificationInterface;
+use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
@@ -86,6 +87,16 @@ class PostbackNotification implements PostbackNotificationInterface
     protected $transactionBuilder;
 
     /**
+     * @var \Magento\Sales\Model\Service\InvoiceService
+     */
+    protected $invoiceService;
+
+    /**
+     * @var InvoiceSender
+     */
+    protected $invoiceSender;
+
+    /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \Magento\Sales\Model\Order $order
@@ -109,7 +120,9 @@ class PostbackNotification implements PostbackNotificationInterface
         \Magento\Framework\Webapi\Request $request,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         LoggerInterface $logger,
-        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
+        \Magento\Sales\Model\Service\InvoiceService $invoiceService,
+        InvoiceSender $invoiceSender
     ) {
     
         $this->scopeConfig = $scopeConfig;
@@ -123,6 +136,8 @@ class PostbackNotification implements PostbackNotificationInterface
         $this->objectManager = $objectManager;
         $this->logger = $logger;
         $this->transactionBuilder = $transactionBuilder;
+        $this->invoiceService = $invoiceService;
+        $this->invoiceSender = $invoiceSender;
 
         $this->icepayPostback = $this->objectManager->create('Icepay\API\Icepay_Postback');
     }
@@ -215,6 +230,22 @@ class PostbackNotification implements PostbackNotificationInterface
                         $this->order->save();
 
                         $this->logger->debug('Order status has changed to OK');
+
+
+                        if($this->order->canInvoice()) {
+                            $invoice = $this->invoiceService->prepareInvoice($this->order)->register();
+                            $invoice->setState(\Magento\Sales\Model\Order\Invoice::STATE_PAID);
+                            $invoice->save();
+                            $this->invoiceSender->send($invoice);
+                            //send notification code
+                            $this->order->addStatusHistoryComment(
+                                __('Notified customer about invoice #%1.', $invoice->getId())
+                            )
+                                ->setIsCustomerNotified(true)
+                                ->save();
+                        }
+
+
                         break;
                     case Icepay_StatusCode::ERROR:
                         $this->order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
