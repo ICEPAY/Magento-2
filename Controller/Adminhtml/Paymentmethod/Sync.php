@@ -9,8 +9,9 @@ namespace Icepay\IcpCore\Controller\Adminhtml\Paymentmethod;
 
 use Icepay\IcpCore\Api\Data;
 use Icepay\IcpCore\Api;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 
-class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
+class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod implements HttpPostActionInterface
 {
 
     /**
@@ -87,8 +88,15 @@ class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
     }
 
 
+    /**
+     *  @return void|\Magento\Backend\App\Action
+     */
     public function execute()
     {
+
+        if (!$this->getRequest()->isPost()) {
+            return $this->_redirect('*/*/index');
+        }
 
         $storeIds = [];
         $redirectParams = [];
@@ -214,4 +222,5 @@ class Sync extends \Icepay\IcpCore\Controller\Adminhtml\Paymentmethod
         }
         return $arr;
     }
+
 }

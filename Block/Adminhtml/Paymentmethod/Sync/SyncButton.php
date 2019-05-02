@@ -49,7 +49,9 @@ class SyncButton implements ButtonProviderInterface
         if ($this->authorization->isAllowed('Icepay_IcpCore::paymentmethod_save')) {
             $data = [
                 'label' => __('Sync'),
-                'on_click' => "syncPaymentMethods('" . $this->getSyncUrl() . "')",
+                'on_click' => 'deleteConfirm(\'' . __(
+                        'Are you sure you want to retrieve payment method information from ICEPAY payment gateway?'
+                    ) . '\', \'' . $this->getSyncUrl() . '\', {data: {form_key: window.FORM_KEY}})',
                 'class' => 'primary',
                 'sort_order' => 10,
             ];
@@ -64,7 +66,7 @@ class SyncButton implements ButtonProviderInterface
      */
     public function getSyncUrl()
     {
-        $params = ['_current' => true];
+        $params = ['_current' => true, '_query' => ['isAjax' => null]];
 
         if ($this->context->getRequest()->getParam('store')) {
             $params['store'] = (int)$this->context->getRequest()->getParam('store');
