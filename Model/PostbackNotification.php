@@ -97,6 +97,11 @@ class PostbackNotification implements PostbackNotificationInterface
     protected $invoiceSender;
 
     /**
+     * @var \Magento\Framework\DB\Transaction
+     */
+    protected $transaction;
+
+    /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \Magento\Sales\Model\Order $order
@@ -122,7 +127,8 @@ class PostbackNotification implements PostbackNotificationInterface
         LoggerInterface $logger,
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
-        InvoiceSender $invoiceSender
+        InvoiceSender $invoiceSender,
+        \Magento\Framework\DB\Transaction $transaction
     ) {
     
         $this->scopeConfig = $scopeConfig;
@@ -138,6 +144,7 @@ class PostbackNotification implements PostbackNotificationInterface
         $this->transactionBuilder = $transactionBuilder;
         $this->invoiceService = $invoiceService;
         $this->invoiceSender = $invoiceSender;
+        $this->transaction = $transaction;
 
         $this->icepayPostback = $this->objectManager->create('Icepay\API\Icepay_Postback');
     }
@@ -233,19 +240,38 @@ class PostbackNotification implements PostbackNotificationInterface
 
 
                         if($this->order->canInvoice()) {
-                            $invoice = $this->invoiceService->prepareInvoice($this->order)->register();
-                            $invoice->setState(\Magento\Sales\Model\Order\Invoice::STATE_PAID);
+
+                            $invoice = $this->invoiceService->prepareInvoice($this->order);
+
+                            if (!$invoice) {
+                                $this->logger->error('The invoice can\'t be saved at this time.');
+                                break;
+                            }
+
+                            if (!$invoice->getTotalQty()) {
+                                $this->logger->error('The invoice can\'t be created without products');
+                                break;
+                            }
+
+                            $invoice->register();
+                            $invoice->pay();
                             $invoice->save();
+
+                            $transactionSave = $this->transaction->addObject(
+                                $invoice
+                            )->addObject(
+                                $invoice->getOrder()
+                            );
+                            $transactionSave->save();
+                            $this->order->addRelatedObject($invoice);
                             $this->invoiceSender->send($invoice);
-                            //send notification code
+
                             $this->order->addStatusHistoryComment(
                                 __('Notified customer about invoice #%1.', $invoice->getId())
                             )
                                 ->setIsCustomerNotified(true)
                                 ->save();
                         }
-
-
                         break;
                     case Icepay_StatusCode::ERROR:
                         $this->order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
