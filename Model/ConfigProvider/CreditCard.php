@@ -14,23 +14,4 @@ class CreditCard extends AbstractConfigProvider
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\CreditCard::CODE;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfig()
-    {
-        $quote = $this->checkoutSession->getQuote();
-        return $this->method->isAvailable($quote) ? [
-            'payment' => [
-                'icepay' => [
-                    'creditcard' => [
-                        'paymentMethodLogoSrc' => $this->getPaymentMethodLogoSrc(),
-                        'issuers' => $this->getIssuerList(),
-                        'redirectUrl' => $this->getMethodRedirectUrl(),
-                        'getPaymentMethodDisplayName' => $this->getPaymentMethodDisplayName()
-                    ],
-                ],
-            ],
-        ] : [];
-    }
 }

@@ -55,8 +55,32 @@ class AbstractConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        return [];
+        //$quote = $this->checkoutSession->getQuote();
+        $issuerList = $this->getIssuerList();
+        $propertyName = 'issuers';
+
+        $issuers = '';
+        if(count($issuerList) == 1 && $issuerList[0]['code'] == "DEFAULT" ){
+            $issuers = $issuerList[0];
+            $propertyName = 'issuer';
+        } else {
+            $issuers = $issuerList;
+        }
+
+        return /*$this->method->isAvailable($quote) ?*/ [
+            'payment' => [
+                'icepay' => [
+                    strtolower($this->method->getIcepayMethodCode()) => [
+                        'paymentMethodLogoSrc' => $this->getPaymentMethodLogoSrc(),
+                        $propertyName => $issuers,
+                        'redirectUrl' => $this->getMethodRedirectUrl(),
+                        'getPaymentMethodDisplayName' => $this->getPaymentMethodDisplayName()
+                    ],
+                ],
+            ],
+        ]; // : [];
     }
+
 
     protected function getIssuerList()
     {

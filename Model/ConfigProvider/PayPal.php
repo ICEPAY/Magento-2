@@ -14,23 +14,4 @@ class PayPal extends AbstractConfigProvider
      */
     protected $methodCode = \Icepay\IcpCore\Model\PaymentMethod\PayPal::CODE;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfig()
-    {
-        $quote = $this->checkoutSession->getQuote();
-        return $this->method->isAvailable($quote) ? [
-            'payment' => [
-                'icepay' => [
-                    'paypal' => [
-                        'paymentMethodLogoSrc' => $this->getPaymentMethodLogoSrc(),
-                        'issuer' => $this->getIssuerList()[0],
-                        'redirectUrl' => $this->getMethodRedirectUrl(),
-                        'getPaymentMethodDisplayName' => $this->getPaymentMethodDisplayName()
-                    ],
-                ],
-            ],
-        ] : [];
-    }
 }

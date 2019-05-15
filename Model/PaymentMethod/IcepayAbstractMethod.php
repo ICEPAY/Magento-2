@@ -145,7 +145,10 @@ abstract class IcepayAbstractMethod extends \Magento\Payment\Model\Method\Abstra
             $pmData = $this->paymentMethod->getRawPmData();
             $method = $mt->loadFromArray(unserialize($pmData));
             $this->paymentMethodInformation = $method;
+            return true;
         }
+
+        return false;
     }
 
 
@@ -191,8 +194,8 @@ abstract class IcepayAbstractMethod extends \Magento\Payment\Model\Method\Abstra
 
     public function getIssuerList(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if ($this->paymentMethodInformation == null) {
-            $this->initPaymentMethodInformation();
+        if ($this->paymentMethodInformation == null && !$this->initPaymentMethodInformation()) {
+            return [];
         }
 
         $paymentMethodCode = static::PMCODE;
@@ -209,14 +212,14 @@ abstract class IcepayAbstractMethod extends \Magento\Payment\Model\Method\Abstra
 
         $arr = [];
         foreach ($list as $issuer) {
-            foreach ($issuer->Countries as $country) {
-                if ( is_null($countryCode) || strtoupper($country->CountryCode) == strtoupper($countryCode) || $country->CountryCode == "00") {
+//            foreach ($issuer->Countries as $country) {
+//                if ( is_null($countryCode) || strtoupper($country->CountryCode) == strtoupper($countryCode) || $country->CountryCode == "00") {
                     array_push($arr, [
                         'name' => $issuer->Description,
                         'code' => $issuer->IssuerKeyword,
                     ]);
-                }
-            }
+//                }
+//            }
         }
 
         return $arr;
@@ -326,9 +329,10 @@ abstract class IcepayAbstractMethod extends \Magento\Payment\Model\Method\Abstra
 
     public function getPaymentMethodDisplayName()
     {
-        if ($this->paymentMethodInformation == null) {
-            $this->initPaymentMethodInformation();
+        if ($this->paymentMethodInformation == null && !$this->initPaymentMethodInformation()) {
+            return '';
         }
+	
         return $this->paymentMethod->getDisplayName();
     }
     
